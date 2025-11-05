@@ -1,20 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Welcome to Kunal’s GitHub.io</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kunal's GitHub Pages</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
+      background: #fafafa;
+    }
+    header {
+      background: #222;
+      color: #fff;
+      padding: 1rem;
       text-align: center;
-      margin-top: 80px;
+    }
+    nav {
+      background: #333;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1.25rem;
+      display: block;
+    }
+    nav a:hover {
+      background: #555;
+    }
+    main {
+      padding: 2rem;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>Hello from my GitHub Pages!</h1>
-  <p>This is the homepage for <strong>kunal394.github.io</strong>.</p>
+  <header>
+    <h1>Welcome to Kunal’s GitHub.io</h1>
+  </header>
 
-  <p><a href="/testsomething">Go to Test Something page →</a></p>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/getsitemetadata">Get Site Metadata</a>
+  </nav>
+
+  <main>
+    <h2>Home Page</h2>
+    <p>Welcome to my GitHub Pages site. Pick a section from the navbar!</p>
+  </main>
 </body>
 </html>
