@@ -26,27 +26,102 @@
     <div id="output"></div>
 
     <script>
+        // -----------------------------------------------------
+        //  Reliable iOS dimension extractor
+        // -----------------------------------------------------
+
+        const KNOWN_WIDTHS = [320, 360, 375, 390, 393, 402, 414, 428, 430];
+
+        function normalizeCssDimension(dim) {
+            let closest = dim;
+            let minDiff = Infinity;
+
+            for (const w of KNOWN_WIDTHS) {
+                const diff = Math.abs(dim - w);
+                if (diff < minDiff && diff <= 6) {
+                    minDiff = diff;
+                    closest = w;
+                }
+            }
+            return closest;
+        }
+
+        function getReliableCssWidth() {
+            return normalizeCssDimension(screen.width);
+        }
+
+        function getReliableCssHeight() {
+            return normalizeCssDimension(screen.height);
+        }
+
+        function getReliableScreenDimensions() {
+            const cssWidth = getReliableCssWidth();
+            const cssHeight = getReliableCssHeight();
+            const dpr = window.devicePixelRatio || 1;
+
+            return {
+                cssWidth,
+                cssHeight,
+                dpr,
+                physicalWidth: cssWidth * dpr,
+                physicalHeight: cssHeight * dpr,
+                raw: {
+                    innerWidth: window.innerWidth,
+                    innerHeight: window.innerHeight,
+                    screenWidth: screen.width,
+                    screenHeight: screen.height
+                }
+            };
+        }
+
+        // -----------------------------------------------------
+        // Logging + UI updates
+        // -----------------------------------------------------
+
         function displayInfo() {
             const output = document.getElementById('output');
             const info = [];
 
-            /* ---- ORIGINAL LOGS (unchanged) ---- */
+            info.push('<div class="info"><strong>navigator.userAgent:</strong> <code>' + navigator.userAgent + '</code></div>');
+            info.push('<div class="info"><strong>navigator.platform:</strong> <code>' + navigator.platform + '</code></div>');
+            info.push('<div class="info"><strong>navigator.vendor:</strong> <code>' + navigator.vendor + '</code></div>');
 
-            // User Agent info
-            info.push(`<div class="info"><strong>navigator.userAgent:</strong> <code>${navigator.userAgent}</code></div>`);
-            info.push(`<div class="info"><strong>navigator.platform:</strong> <code>${navigator.platform}</code></div>`);
-            info.push(`<div class="info"><strong>navigator.vendor:</strong> <code>${navigator.vendor}</code></div>`);
+            info.push('<hr>');
 
-            info.push("<hr>");
+            info.push('<div class="info"><strong>screen.width:</strong> ' + screen.width + 'px</div>');
+            info.push('<div class="info"><strong>screen.height:</strong> ' + screen.height + 'px</div>');
+            info.push('<div class="info"><strong>screen.availWidth:</strong> ' + screen.availWidth + 'px</div>');
+            info.push('<div class="info"><strong>screen.availHeight:</strong> ' + screen.availHeight + 'px</div>');
 
-            // Screen properties
-            info.push(`<div class="info"><strong>screen.width:</strong> ${screen.width}px</div>`);
-            info.push(`<div class="info"><strong>screen.height:</strong> ${screen.height}px</div>`);
-            info.push(`<div class="info"><strong>screen.availWidth:</strong> ${screen.availWidth}px</div>`);
-            info.push(`<div class="info"><strong>screen.availHeight:</strong> ${screen.availHeight}px</div>`);
+            info.push('<div class="info"><strong>window.innerWidth:</strong> ' + window.innerWidth + 'px</div>');
+            info.push('<div class="info"><strong>window.innerHeight:</strong> ' + window.innerHeight + 'px</div>');
+            info.push('<div class="info"><strong>window.outerWidth:</strong> ' + window.outerWidth + 'px</div>');
+            info.push('<div class="info"><strong>window.outerHeight:</strong> ' + window.outerHeight + 'px</div>');
 
-            // Window properties
-            info.push(`<div class="info"><strong>window.innerWidth:</strong> ${window.innerWidth}px</div>`);
-            info.push(`<div class="info"><strong>window.innerHeight:</strong> ${window.innerHeight}px</div>`);
-            info.push(`<div class="info"><strong>window.outerWidth:</strong> ${window.outerWidth}px</div>`);
-            info.push(`<div class="info"><strong>window.outerHeight:</strong> ${window.outerHeight}px</div>`);
+            info.push('<div class="info"><strong>document.documentElement.clientWidth:</strong> ' + document.documentElement.clientWidth + 'px</div>');
+            info.push('<div class="info"><strong>document.documentElement.clientHeight:</strong> ' + document.documentElement.clientHeight + 'px</div>');
+
+            info.push('<div class="info"><strong>window.devicePixelRatio:</strong> ' + window.devicePixelRatio + '</div>');
+
+            const dims = getReliableScreenDimensions();
+
+            info.push('<hr>');
+            info.push('<div class="info"><strong>[New] normalized CSS width:</strong> ' + dims.cssWidth + 'px</div>');
+            info.push('<div class="info"><strong>[New] normalized CSS height:</strong> ' + dims.cssHeight + 'px</div>');
+            info.push('<div class="info"><strong>[New] physical width (css × dpr):</strong> ' + dims.physicalWidth + 'px</div>');
+            info.push('<div class="info"><strong>[New] physical height (css × dpr):</strong> ' + dims.physicalHeight + 'px</div>');
+
+            const physicalMin = Math.min(dims.physicalWidth, dims.physicalHeight);
+            const physicalMax = Math.max(dims.physicalWidth, dims.physicalHeight);
+            info.push('<div class="info"><strong>[New] normalized physical min:</strong> ' + physicalMin + '</div>');
+            info.push('<div class="info"><strong>[New] normalized physical max:</strong> ' + physicalMax + '</div>');
+            info.push('<div class="info"><strong>[New] device signature:</strong> ' + physicalMin + 'x' + physicalMax + '@' + dims.dpr + '</div>');
+
+            output.innerHTML = info.join('');
+        }
+
+        displayInfo();
+        window.addEventListener('resize', displayInfo);
+    </script>
+</body>
+</html>
