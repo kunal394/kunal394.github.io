@@ -40,16 +40,23 @@
 
     <script>
         function openApp() {
-            var deepLink = "yourapp://product/123"; // custom-scheme deep link
-            var universalLink = "https://yourdomain.com/product/123";
+            var customSchemeLink = "ms-officemobile://open?deeplinkurl=https%3A%2F%2Fxyz.abc.com%2Ftitle%3D123";
+            var appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
 
-            // Try universal link first
-            window.location.href = universalLink;
-
-            // If UL is blocked (same-domain issue), fallback to custom scheme
-            setTimeout(() => {
-                window.location.href = deepLink;
+            // Set timeout to redirect to App Store if app doesn't open
+            var timeout = setTimeout(function() {
+                window.location.href = appStoreLink;
             }, 800);
+
+            // Listen for page visibility change (app opened)
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    clearTimeout(timeout);
+                }
+            });
+
+            // Try opening the app
+            window.location.href = customSchemeLink;
         }
     </script>
 </head>
