@@ -39,29 +39,46 @@
     </style>
 
     <script>
-        function openApp() {
-            const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-            const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
+        function openAppReliably() {
+            const customScheme = "ms-officemobile://..."; // Your scheme
+            const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?..."; // Your App Store link
         
-            const start = Date.now();
+            let visibilityChangeFired = false;
+            let fallbackExecuted = false;
         
-            // Try opening the app
-            window.location.href = customScheme;
+            // 1. Create a temporary iframe to initiate the deep link
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
         
-            // After 1 second check if the browser was backgrounded
-            setTimeout(() => {
-                const now = Date.now();
-                const delta = now - start;
-        
-                // If delta > 1500 ms → Safari was suspended → app opened → do nothing
-                if (delta > 1500) {
-                    return;
+            // 2. Set the document visibility change listener
+            // This fires when the user leaves the browser (e.g., app successfully opened)
+            const onVisibilityChange = () => {
+                if (document.hidden) {
+                    visibilityChangeFired = true;
                 }
+            };
+            document.addEventListener('visibilitychange', onVisibilityChange);
         
-                // Otherwise → app didn't open → go to App Store
-                window.location.href = appStoreLink;
+            // 3. The fallback function
+            const fallbackToStore = () => {
+                // Only run fallback if visibilitychange hasn't fired (meaning app probably didn't open)
+                if (!visibilityChangeFired && !fallbackExecuted) {
+                    fallbackExecuted = true;
+                    window.location.replace(appStoreLink);
+                }
+                // Cleanup listeners/iframe
+                document.removeEventListener('visibilitychange', onVisibilityChange);
+                iframe.remove();
+            };
         
-            }, 1200);
+            // 4. Try to open the app (using the iframe)
+            iframe.src = customScheme;
+            document.body.appendChild(iframe);
+        
+            // 5. Set a short timeout for the fallback
+            // This timeout must be brief, giving the OS time to recognize the scheme.
+            // 500ms is generally sufficient.
+            setTimeout(fallbackToStore, 500);
         }
     </script>
 </head>
