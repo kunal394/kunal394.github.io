@@ -36,12 +36,31 @@
         .btn:active {
             background: #005ecb;
         }
+
+        .btn.secondary {
+            background: #34c759;
+        }
+
+        .btn.secondary:active {
+            background: #28a745;
+        }
+
+        .btn.tertiary {
+            background: #ff9500;
+        }
+
+        .btn.tertiary:active {
+            background: #cc7700;
+        }
     </style>
 
     <script>
-        const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const customScheme1 = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const customScheme2 = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const customScheme3 = "ms-officemobile://create?fromcode=cmm56zfqvf0&utm_campaign=paidmktgcreateurl&utm_source=deeplink&ct=paidmktgcreateurl&ccac=create&ocid=paidmktgcreateurl";
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
-        function openApp() {
+        
+        function openApp(schemeUrl) {
             const ua = navigator.userAgent.toLowerCase();
             const isIOS = /iphone|ipad|ipod/.test(ua);
         
@@ -127,7 +146,7 @@
             window.addEventListener("focus", focusHandler);
         
             // Try to open the app
-            window.location.href = customScheme;
+            window.location.href = schemeUrl;
         
             // Fallback only if no popup interaction detected
             // Store the timeout ID so we can cancel it if popup appears
@@ -144,8 +163,10 @@
     <h1>Continue in App</h1>
     <p>You can open this page directly in the app for a better experience.</p>
 
-    <!-- Center Button -->
-    <a class="btn" href="javascript:void(0)" onclick="openApp()">Open in App</a>
+    <!-- Three Buttons -->
+    <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme1)">Open Chat 1</a>
+    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(customScheme2)">Open Chat 2</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(customScheme3)">Open Create</a>
 
 </body>
 </html>
