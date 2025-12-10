@@ -51,37 +51,100 @@
             }
         
             let appOpened = false;
-            const startTime = Date.now();
-        
-            // Create a hidden iframe to attempt the custom scheme
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
+            let popupHandled = false;
+            let timeoutId = null;
+            let longTimeoutId = null;
         
             const cleanup = () => {
-                document.body.removeChild(iframe);
-                window.removeEventListener('focus', focusHandler);
+                if (timeoutId) clearTimeout(timeoutId);
+                if (longTimeoutId) clearTimeout(longTimeoutId);
+                document.removeEventListener("visibilitychange", visibilityHandler);
+                document.removeEventListener("pagehide", pageHideHandler);
+                window.removeEventListener("blur", blurHandler);
+                window.removeEventListener("focus", focusHandler);
             };
         
-            const focusHandler = () => {
-                const elapsed = Date.now() - startTime;
-                if (elapsed > 500) {
+            const openAppStore = () => {
+                if (!appOpened && !popupHandled) {
+                    cleanup();
+                    popupHandled = true;
+                    window.location.href = appStoreLink;
+                }
+            };
+        
+            // App successfully opened (page becomes hidden)
+            const visibilityHandler = () => {
+                if (document.hidden || document.visibilityState === 'hidden') {
                     appOpened = true;
                     cleanup();
                 }
             };
         
-            window.addEventListener('focus', focusHandler);
+            const pageHideHandler = () => {
+                appOpened = true;
+                cleanup();
+            };
         
-            // Try to open via iframe (less disruptive)
-            iframe.src = customScheme;
+            const blurHandler = () => {
+                // Only consider this as app opening if it happens after some delay
+                // (to account for the popup appearing)
+                setTimeout(() => {
+                    if (document.hidden || document.visibilityState === 'hidden') {
+                        appOpened = true;
+                        cleanup();
+                    }
+                }, 100);
+            };
         
-            setTimeout(() => {
+            // Handle returning focus (user might have denied popup)
+            const focusHandler = () => {
+                // If we get focus back after a reasonable time, 
+                // user likely denied the popup
                 if (!appOpened) {
-                    cleanup();
-                    window.location.href = appStoreLink;
+                    setTimeout(() => {
+                        if (!document.hidden && !appOpened) {
+                            openAppStore();
+                        }
+                    }, 500); // Give a moment for any delayed app opening
                 }
-            }, 1000);
+            };
+        
+            // Set up event listeners
+            document.addEventListener("visibilitychange", visibilityHandler);
+            document.addEventListener("pagehide", pageHideHandler);
+            window.addEventListener("blur", blurHandler);
+            window.addEventListener("focus", focusHandler);
+        
+            const startTime = Date.now();
+        
+            try {
+                window.location.href = customScheme;
+            } catch (e) {
+                openAppStore();
+                return;
+            }
+        
+            // Short timeout for immediate failures (custom scheme not supported)
+            timeoutId = setTimeout(() => {
+                if (!appOpened && !document.hidden) {
+                    const elapsed = Date.now() - startTime;
+                    // If we're still here very quickly, scheme likely failed
+                    if (elapsed < 200) {
+                        openAppStore();
+                    }
+                }
+            }, 250);
+        
+            // Longer timeout to handle popup scenarios
+            // This accounts for users taking time to respond to the popup
+            longTimeoutId = setTimeout(() => {
+                if (!appOpened && !popupHandled) {
+                    // Check if page is still visible (popup was denied or ignored)
+                    if (!document.hidden && document.visibilityState !== 'hidden') {
+                        openAppStore();
+                    }
+                }
+            }, 4000); // Longer timeout to account for popup interaction time
         }
     </script>
 </head>
