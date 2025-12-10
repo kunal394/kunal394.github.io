@@ -43,23 +43,25 @@
             const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
             const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
         
-            let timeout;
+            const start = Date.now();
         
-            // If the page becomes hidden → the app opened
-            const onHidden = () => {
-                clearTimeout(timeout);
-            };
-            document.addEventListener("visibilitychange", onHidden, { once: true });
-        
-            // 1) Immediately try opening the app inside the SAME user gesture
+            // Try opening the app
             window.location.href = customScheme;
         
-            // 2) Install the fallback timer slightly later
+            // After 1 second check if the browser was backgrounded
             setTimeout(() => {
-                timeout = setTimeout(() => {
-                    window.location.href = appStoreLink;
-                }, 1200);  // slightly higher for slow Safari transitions
-            }, 50);  // install fallback AFTER Safari reacts to the deep link
+                const now = Date.now();
+                const delta = now - start;
+        
+                // If delta > 1500 ms → Safari was suspended → app opened → do nothing
+                if (delta > 1500) {
+                    return;
+                }
+        
+                // Otherwise → app didn't open → go to App Store
+                window.location.href = appStoreLink;
+        
+            }, 1200);
         }
     </script>
 </head>
