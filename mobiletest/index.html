@@ -44,46 +44,44 @@
         function openApp() {
             const ua = navigator.userAgent.toLowerCase();
             const isIOS = /iphone|ipad|ipod/.test(ua);
-    
+        
             if (!isIOS) {
                 window.location.href = appStoreLink;
                 return;
             }
-    
-            const isSafari =
-                ua.includes("safari") &&
-                !ua.includes("crios") &&
-                !ua.includes("fxios") &&
-                !ua.includes("edgios") &&
-                !ua.includes("brave");
-    
-            const isIOSChromium =
-                ua.includes("crios") ||
-                ua.includes("fxios") ||
-                ua.includes("edgios") ||
-                ua.includes("brave");
-    
-            // VISIBILITY / TIMER BASED DETECTION
+        
             let appOpened = false;
-            const handler = () => { if (document.hidden) appOpened = true; };
-            document.addEventListener("visibilitychange", handler);
-    
-            const start = Date.now();
-            window.location.href = customScheme;
-    
-            setTimeout(() => {
-                const elapsed = Date.now() - start;
-    
-                // If app opened → do nothing
-                if (appOpened || document.hidden || elapsed > 1200) {
-                    document.removeEventListener("visibilitychange", handler);
-                    return;
+            const startTime = Date.now();
+        
+            // Create a hidden iframe to attempt the custom scheme
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+        
+            const cleanup = () => {
+                document.body.removeChild(iframe);
+                window.removeEventListener('focus', focusHandler);
+            };
+        
+            const focusHandler = () => {
+                const elapsed = Date.now() - startTime;
+                if (elapsed > 500) {
+                    appOpened = true;
+                    cleanup();
                 }
-    
-                // App did not open → fallback
-                window.location.replace(appStoreLink);
-                document.removeEventListener("visibilitychange", handler);
-            }, 800);
+            };
+        
+            window.addEventListener('focus', focusHandler);
+        
+            // Try to open via iframe (less disruptive)
+            iframe.src = customScheme;
+        
+            setTimeout(() => {
+                if (!appOpened) {
+                    cleanup();
+                    window.location.href = appStoreLink;
+                }
+            }, 1000);
         }
     </script>
 </head>
