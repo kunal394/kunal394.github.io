@@ -41,47 +41,78 @@
     <script>
         const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
-        function openApp() {
-            // const scheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-            // const appStore = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
+        function openAppUniversal() {
+            const playStoreLink = "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow";
         
-            let hasAppOpened = false;
+            // --- 1. Environment detection ---
+            const ua = navigator.userAgent.toLowerCase();
+            const isIOS = /iphone|ipad|ipod/.test(ua);
+            const isAndroid = /android/.test(ua);
+            const isSafari = isIOS && /^((?!chrome|crios|fxios|brave).)*safari/.test(ua);
+            const isIOSChromium = isIOS && (ua.includes("crios") || ua.includes("fxios") || ua.includes("edgios") || ua.includes("brave"));
+            const isDesktop = !isIOS && !isAndroid;
         
-            // --- Detect leaving browser (when app opens) ---
-            const visibilityHandler = () => {
-                if (document.hidden) {
-                    hasAppOpened = true;
-                }
-            };
-            document.addEventListener("visibilitychange", visibilityHandler);
+            // Desktop → Just redirect to store
+            if (isDesktop) {
+                window.location.href = appStoreLink;
+                return;
+            }
         
-            // --- Try opening the app ---
-            const start = Date.now();
-            window.location.href = scheme;
+            // --- 2. Android: Intent-based fallback ---
+            if (isAndroid) {
+                const intentURL =
+                    `intent://chat/#Intent;scheme=ms-officemobile;package=com.microsoft.office.officehubrow;end`;
+                
+                // Try opening scheme first
+                window.location.href = customScheme;
         
-            // --- Fallback logic ---
-            setTimeout(() => {
-                const elapsed = Date.now() - start;
+                // Fallback (Android is reliable: timers get paused)
+                setTimeout(() => {
+                    window.location.href = intentURL;
+                }, 800);
         
-                // If user left the browser → app opened → don't redirect
-                if (hasAppOpened || document.hidden) {
-                    cleanup();
-                    return;
-                }
+                return;
+            }
         
-                // iOS Safari suspends timers, so if elapsed > 800ms → app likely opened
-                if (elapsed > 800) {
-                    cleanup();
-                    return;
-                }
+            // --- 3. iOS Safari: visibility-based fallback ---
+            if (isSafari) {
+                let opened = false;
         
-                // App did not open → go to App Store
-                window.location.replace(appStore);
-                cleanup();
-            }, 600);
+                const handler = () => {
+                    if (document.hidden) opened = true;
+                };
+                document.addEventListener("visibilitychange", handler);
         
-            function cleanup() {
-                document.removeEventListener("visibilitychange", visibilityHandler);
+                // Try opening app
+                window.location.href = customScheme;
+        
+                // Safari needs ≥1200ms
+                setTimeout(() => {
+                    document.removeEventListener("visibilitychange", handler);
+                    if (!opened) {
+                        window.location.replace(appStoreLink);
+                    }
+                }, 1300);
+                return;
+            }
+        
+            // --- 4. iOS Chromium (Chrome / Edge / Brave / Firefox on iOS) ---
+            if (isIOSChromium) {
+                const start = Date.now();
+        
+                window.location.href = customScheme;
+        
+                setTimeout(() => {
+                    const delta = Date.now() - start;
+        
+                    // If JS was paused → app opened
+                    if (delta > 2000) return;
+        
+                    // App did NOT open → fallback
+                    window.location.replace(appStoreLink);
+                }, 700);
+        
+                return;
             }
         }
     </script>
