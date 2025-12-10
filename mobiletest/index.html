@@ -42,22 +42,23 @@
         function openApp() {
             var customSchemeLink = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
             var appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
-
-            // Set timeout to redirect to App Store if app doesn't open
+    
             var timeout = setTimeout(function() {
                 window.location.href = appStoreLink;
             }, 800);
-
-            // Listen for page visibility change (app opened)
-            document.addEventListener('visibilitychange', function() {
+    
+            // MUST attach listener BEFORE attempting to open the app
+            function handleVisibilityChange() {
                 if (document.hidden) {
                     clearTimeout(timeout);
                 }
-            });
-
-            // Try opening the app
+            }
+    
+            document.addEventListener('visibilitychange', handleVisibilityChange, { once: true });
+    
+            // Now try opening the app
             window.location.href = customSchemeLink;
-        }
+    }
     </script>
 </head>
 <body>
