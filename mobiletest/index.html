@@ -41,46 +41,37 @@
     <script>
         const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
-        function openAppReliably() {
-            //const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-            //const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
+        function openApp() {
+            const customScheme = 
+                "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         
-            let visibilityChangeFired = false;
-            let fallbackExecuted = false;
+            const appStoreLink = 
+                "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
         
-            // 1. Create a temporary iframe to initiate the deep link
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
+            // --- 1. Record start time ---
+            const start = Date.now();
         
-            // 2. Set the document visibility change listener
-            // This fires when the user leaves the browser (e.g., app successfully opened)
-            const onVisibilityChange = () => {
-                if (document.hidden) {
-                    visibilityChangeFired = true;
+            // --- 2. Attempt to open app ---
+            // assign() avoids history issues better than href
+            window.location.assign(customScheme);
+        
+            // --- 3. Set fallback check ---
+            // 800–1200ms is the sweet spot for modern iOS devices
+            const FALLBACK_CHECK_DELAY = 1000;
+        
+            setTimeout(() => {
+                const delta = Date.now() - start;
+        
+                // --- 4. If JS froze for >1500ms → Safari suspended → app opened ---
+                if (delta > 1500) {
+                    return;  // App opened successfully. Do not redirect.
                 }
-            };
-            document.addEventListener('visibilitychange', onVisibilityChange);
         
-            // 3. The fallback function
-            const fallbackToStore = () => {
-                // Only run fallback if visibilitychange hasn't fired (meaning app probably didn't open)
-                if (!visibilityChangeFired && !fallbackExecuted) {
-                    fallbackExecuted = true;
-                    window.location.replace(appStoreLink);
-                }
-                // Cleanup listeners/iframe
-                document.removeEventListener('visibilitychange', onVisibilityChange);
-                iframe.remove();
-            };
+                // --- 5. App did NOT open → send user to App Store ---
+                // replace() ensures the browser doesn’t remember this navigation
+                window.location.replace(appStoreLink);
         
-            // 4. Try to open the app (using the iframe)
-            iframe.src = customScheme;
-            document.body.appendChild(iframe);
-        
-            // 5. Set a short timeout for the fallback
-            // This timeout must be brief, giving the OS time to recognize the scheme.
-            // 500ms is generally sufficient.
-            setTimeout(fallbackToStore, 500);
+            }, FALLBACK_CHECK_DELAY);
         }
     </script>
 </head>
