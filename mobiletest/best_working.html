@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=YOUR_APP_ID, app-argument=https://yourdomain.com/product/123">
+
+    <title>Open in App</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .btn {
+            background: #007aff;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn:active {
+            background: #005ecb;
+        }
+    </style>
+
+    <script>
+        const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
+        function openApp() {
+            const ua = navigator.userAgent.toLowerCase();
+            const isIOS = /iphone|ipad|ipod/.test(ua);
+        
+            if (!isIOS) {
+                window.location.href = appStoreLink;
+                return;
+            }
+        
+            const isSafari = ua.includes("safari") && !ua.includes("crios") && !ua.includes("fxios") && !ua.includes("edgios");
+            
+            let appOpened = false;
+            let popupShown = false;
+            let shouldOpenAppStore = true;
+            
+            const cleanup = () => {
+                document.removeEventListener("visibilitychange", visibilityHandler);
+                window.removeEventListener("blur", blurHandler);
+                window.removeEventListener("focus", focusHandler);
+            };
+        
+            const openAppStore = () => {
+                if (shouldOpenAppStore && !appOpened) {
+                    cleanup();
+                    window.location.href = appStoreLink;
+                }
+            };
+        
+            const visibilityHandler = () => {
+                if (document.hidden) {
+                    appOpened = true;
+                    shouldOpenAppStore = false;
+                    cleanup();
+                }
+            };
+        
+            const blurHandler = () => {
+                popupShown = true;
+                // Don't open app store immediately - wait to see what happens
+                shouldOpenAppStore = false;
+                
+                // Set a longer timeout to re-enable app store opening
+                setTimeout(() => {
+                    if (!appOpened) {
+                        shouldOpenAppStore = true;
+                    }
+                }, 2000);
+            };
+        
+            const focusHandler = () => {
+                if (popupShown && !appOpened) {
+                    // User returned to page - either denied popup or app failed to open
+                    setTimeout(() => {
+                        if (!document.hidden && !appOpened) {
+                            openAppStore();
+                        }
+                    }, 1000);
+                }
+            };
+        
+            document.addEventListener("visibilitychange", visibilityHandler);
+            window.addEventListener("blur", blurHandler);
+            window.addEventListener("focus", focusHandler);
+        
+            // Try to open the app
+            window.location.href = customScheme;
+        
+            // Fallback only if no popup interaction detected
+            setTimeout(() => {
+                if (!popupShown && !appOpened) {
+                    openAppStore();
+                }
+            }, 2000);
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Continue in App</h1>
+    <p>You can open this page directly in the app for a better experience.</p>
+
+    <!-- Center Button -->
+    <a class="btn" href="javascript:void(0)" onclick="openApp()">Open in App</a>
+
+</body>
+</html>
