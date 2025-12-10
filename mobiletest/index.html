@@ -41,82 +41,47 @@
     <script>
         const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
-        function openAppUniversal() {
-            //const scheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-            //const appStore = "https://apps.apple.com/app/apple-store/id541164041";
-            const playStore = "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow";
+        function openApp() {
+            // const scheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+            // const appStore = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
         
-            // --- 1. Environment detection ---
-            const ua = navigator.userAgent.toLowerCase();
-            const isIOS = /iphone|ipad|ipod/.test(ua);
-            const isAndroid = /android/.test(ua);
-            const isSafari = isIOS && /^((?!chrome|crios|fxios|brave).)*safari/.test(ua);
-            const isIOSChromium = isIOS && (ua.includes("crios") || ua.includes("fxios") || ua.includes("edgios") || ua.includes("brave"));
-            const isDesktop = !isIOS && !isAndroid;
+            let hasAppOpened = false;
         
-            // Desktop → Just redirect to web or store (no app)
-            if (isDesktop) {
-                window.location.href = appStore;
-                return;
-            }
+            // --- Detect leaving browser (when app opens) ---
+            const visibilityHandler = () => {
+                if (document.hidden) {
+                    hasAppOpened = true;
+                }
+            };
+            document.addEventListener("visibilitychange", visibilityHandler);
         
-            // --- 2. Android: Intent-based fallback ---
-            if (isAndroid) {
-                const intentURL =
-                    `intent://chat/#Intent;scheme=ms-officemobile;package=com.microsoft.office.officehubrow;end`;
-                
-                // Try opening scheme first
-                window.location.href = scheme;
+            // --- Try opening the app ---
+            const start = Date.now();
+            window.location.href = scheme;
         
-                // Fallback (Android is reliable: timers get paused)
-                setTimeout(() => {
-                    window.location.href = intentURL;
-                }, 800);
+            // --- Fallback logic ---
+            setTimeout(() => {
+                const elapsed = Date.now() - start;
         
-                return;
-            }
+                // If user left the browser → app opened → don't redirect
+                if (hasAppOpened || document.hidden) {
+                    cleanup();
+                    return;
+                }
         
-            // --- 3. iOS Safari: visibility-based fallback (no timers!) ---
-            if (isSafari) {
-                let opened = false;
+                // iOS Safari suspends timers, so if elapsed > 800ms → app likely opened
+                if (elapsed > 800) {
+                    cleanup();
+                    return;
+                }
         
-                const handler = () => {
-                    if (document.hidden) opened = true;
-                };
-                document.addEventListener("visibilitychange", handler);
+                // App did not open → go to App Store
+                window.location.replace(appStore);
+                cleanup();
+            }, 600);
         
-                // Try opening app
-                window.location.href = scheme;
-        
-                // Only check after delay (Safari needs ≥1200ms)
-                setTimeout(() => {
-                    document.removeEventListener("visibilitychange", handler);
-                    if (!opened) {
-                        window.location.replace(appStore);
-                    }
-                }, 1300);
-                return;
-            }
-        
-            // --- 4. iOS Chromium (Chrome/Edge/Brave/Firefox on iOS) ---
-            // These browsers prompt the user AND DO NOT reliably fire visibilitychange.
-            // Timers DO PAUSE when app opens, so use delta timing.
-            if (isIOSChromium) {
-                const start = Date.now();
-        
-                window.location.href = scheme;
-        
-                setTimeout(() => {
-                    const delta = Date.now() - start;
-        
-                    // If user switched to the app → Safari paused JS → delta >= 2000ms
-                    if (delta > 2000) return;
-        
-                    // App did NOT open → fallback
-                    window.location.replace(appStore);
-                }, 700);
-        
-                return;
+            function cleanup() {
+                document.removeEventListener("visibilitychange", visibilityHandler);
             }
         }
     </script>
