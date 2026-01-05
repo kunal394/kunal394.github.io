@@ -52,6 +52,37 @@
         .btn.tertiary:active {
             background: #cc7700;
         }
+
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #007aff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 
     <script>
@@ -207,9 +238,28 @@
             }
         }
         
-        // Auto-launch on page load using multiple methods
+        // Auto-launch on page load with store fallback
         window.addEventListener("DOMContentLoaded", function() {
             const platform = detectPlatform();
+            let appOpened = false;
+            
+            const openStore = () => {
+                if (!appOpened && !document.hidden) {
+                    // Hide spinner before redirecting
+                    const spinner = document.getElementById('spinner-container');
+                    if (spinner) spinner.classList.add('hidden');
+                    window.location.href = platform.storeLink;
+                }
+            };
+            
+            const visibilityHandler = () => {
+                if (document.hidden) {
+                    appOpened = true;
+                    document.removeEventListener("visibilitychange", visibilityHandler);
+                }
+            };
+            
+            document.addEventListener("visibilitychange", visibilityHandler);
             
             setTimeout(() => {
                 if (platform.isAndroid) {
@@ -240,9 +290,23 @@
                             iframe.parentNode.removeChild(iframe);
                         }
                     }, 2000);
-                } else {
+                    
+                    // Fallback to Play Store if app doesn't open
+                    setTimeout(() => {
+                        openStore();
+                    }, 2500);
+                    
+                } else if (platform.isIOS) {
                     // iOS - try direct navigation
                     window.location.href = customScheme1;
+                    
+                    // Fallback to App Store if app doesn't open
+                    setTimeout(() => {
+                        openStore();
+                    }, 2500);
+                } else {
+                    // Desktop or unknown - go directly to store
+                    openStore();
                 }
             }, 500);
         });
@@ -250,8 +314,13 @@
 </head>
 <body>
 
+    <div id="spinner-container" class="spinner-container">
+        <div class="spinner"></div>
+        <p class="spinner-text">Opening app...</p>
+    </div>
+
     <h1>Continue in App</h1>
-    <p>Attempting to open app...</p>
+    <p>If the app doesn't open, tap a button below.</p>
 
     <!-- Three Buttons -->
     <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme1)">Researcher</a>
