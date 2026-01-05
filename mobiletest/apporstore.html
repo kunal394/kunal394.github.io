@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=YOUR_APP_ID, app-argument=https://yourdomain.com/product/123">
+
+    <title>Open in App</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .btn {
+            background: #007aff;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn:active {
+            background: #005ecb;
+        }
+
+        .btn.secondary {
+            background: #34c759;
+        }
+
+        .btn.secondary:active {
+            background: #28a745;
+        }
+
+        .btn.tertiary {
+            background: #ff9500;
+        }
+
+        .btn.tertiary:active {
+            background: #cc7700;
+        }
+    </style>
+
+    <script>
+        const customScheme1 = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const customScheme2 = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const customScheme3 = "ms-officemobile://create?fromcode=cmm56zfqvf0&utm_campaign=paidmktgcreateurl&utm_source=deeplink&ct=paidmktgcreateurl&ccac=create&ocid=paidmktgcreateurl";
+        
+        const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
+        const playStoreLink = "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow";
+        
+        function detectPlatform() {
+            const ua = navigator.userAgent.toLowerCase();
+            
+            const isIOS = /iphone|ipad|ipod/.test(ua);
+            const isAndroid = /android/.test(ua);
+            
+            // Browser detection for iOS
+            const isSafari = isIOS && ua.includes("safari") && !ua.includes("crios") && !ua.includes("fxios") && !ua.includes("edgios");
+            const isChromeiOS = isIOS && ua.includes("crios");
+            const isEdgeiOS = isIOS && ua.includes("edgios");
+            
+            // Browser detection for Android
+            const isChromeAndroid = isAndroid && ua.includes("chrome") && !ua.includes("edg");
+            const isEdgeAndroid = isAndroid && ua.includes("edg");
+            
+            return {
+                isIOS,
+                isAndroid,
+                isSafari,
+                isChromeiOS,
+                isEdgeiOS,
+                isChromeAndroid,
+                isEdgeAndroid,
+                storeLink: isIOS ? appStoreLink : playStoreLink
+            };
+        }
+        
+        function openApp(schemeUrl) {
+            const platform = detectPlatform();
+            
+            let appOpened = false;
+            let fallbackTimeoutId = null;
+            
+            const cleanup = () => {
+                if (fallbackTimeoutId) clearTimeout(fallbackTimeoutId);
+                document.removeEventListener("visibilitychange", visibilityHandler);
+                window.removeEventListener("pagehide", pageHideHandler);
+            };
+            
+            const openStore = () => {
+                if (!appOpened) {
+                    cleanup();
+                    window.location.href = platform.storeLink;
+                }
+            };
+            
+            const visibilityHandler = () => {
+                if (document.hidden) {
+                    appOpened = true;
+                    cleanup();
+                }
+            };
+            
+            const pageHideHandler = () => {
+                appOpened = true;
+                cleanup();
+            };
+            
+            document.addEventListener("visibilitychange", visibilityHandler);
+            window.addEventListener("pagehide", pageHideHandler);
+            
+            if (platform.isIOS) {
+                // iOS handling - use iframe method for more reliable detection
+                if (platform.isSafari) {
+                    // Safari: Use location.href directly, it handles custom schemes well
+                    window.location.href = schemeUrl;
+                    
+                    fallbackTimeoutId = setTimeout(() => {
+                        if (!appOpened && !document.hidden) {
+                            openStore();
+                        }
+                    }, 2500);
+                    
+                } else if (platform.isChromeiOS || platform.isEdgeiOS) {
+                    // Chrome/Edge iOS: These show a confirmation dialog
+                    // Use blur/focus to detect if user interacted with prompt
+                    let promptShown = false;
+                    
+                    const blurHandler = () => {
+                        promptShown = true;
+                        // Clear the fallback since user is seeing the prompt
+                        if (fallbackTimeoutId) clearTimeout(fallbackTimeoutId);
+                    };
+                    
+                    const focusHandler = () => {
+                        if (promptShown && !appOpened && !document.hidden) {
+                            // User came back - they either cancelled or app isn't installed
+                            setTimeout(() => {
+                                if (!document.hidden && !appOpened) {
+                                    openStore();
+                                }
+                            }, 300);
+                        }
+                    };
+                    
+                    window.addEventListener("blur", blurHandler);
+                    window.addEventListener("focus", focusHandler);
+                    
+                    // Also cleanup blur/focus handlers
+                    const originalCleanup = cleanup;
+                    cleanup = () => {
+                        originalCleanup();
+                        window.removeEventListener("blur", blurHandler);
+                        window.removeEventListener("focus", focusHandler);
+                    };
+                    
+                    window.location.href = schemeUrl;
+                    
+                    // Fallback if no prompt appears at all (app not installed, no prompt shown)
+                    fallbackTimeoutId = setTimeout(() => {
+                        if (!promptShown && !appOpened && !document.hidden) {
+                            openStore();
+                        }
+                    }, 2500);
+                }
+                
+            } else if (platform.isAndroid) {
+                // Android handling
+                // Android Chrome and Edge handle intents differently
+                // Using visibility change is generally reliable on Android
+                
+                window.location.href = schemeUrl;
+                
+                fallbackTimeoutId = setTimeout(() => {
+                    if (!appOpened && !document.hidden) {
+                        openStore();
+                    }
+                }, 2000);
+            } else {
+                // Desktop or unknown - just redirect to appropriate store
+                window.location.href = platform.storeLink;
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Continue in App</h1>
+    <p>You can open this page directly in the app for a better experience.</p>
+
+    <!-- Three Buttons -->
+    <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme1)">Researcher</a>
+    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(customScheme2)">Chat with Prompt</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(customScheme3)">Create</a>
+
+</body>
+</html>
