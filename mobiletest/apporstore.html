@@ -176,6 +176,17 @@
                             openStore();
                         }
                     }, 2500);
+                    
+                } else {
+                    // Other iOS browsers (Firefox, in-app browsers, etc.)
+                    // Use simple approach with timeout fallback
+                    window.location.href = schemeUrl;
+                    
+                    fallbackTimeoutId = setTimeout(() => {
+                        if (!appOpened && !document.hidden) {
+                            openStore();
+                        }
+                    }, 2500);
                 }
                 
             } else if (platform.isAndroid) {
@@ -195,12 +206,19 @@
                 window.location.href = platform.storeLink;
             }
         }
+        
+        // Auto-launch on page load
+        window.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                openApp(customScheme1);
+            }, 500);
+        });
     </script>
 </head>
 <body>
 
     <h1>Continue in App</h1>
-    <p>You can open this page directly in the app for a better experience.</p>
+    <p>Attempting to open app...</p>
 
     <!-- Three Buttons -->
     <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme1)">Researcher</a>
