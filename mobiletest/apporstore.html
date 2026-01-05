@@ -219,12 +219,20 @@
                     iframe.src = customScheme1;
                     document.body.appendChild(iframe);
                     
-                    // Method 2: Also try intent URL for Android
+                    // Method 2: Intent URL for Android (COMMENTED OUT)
+                    // Why it was added: Intent URLs are the native Android way to launch apps
+                    // and can sometimes work when custom schemes fail for auto-launch.
+                    // Why it's commented: The intent URL format may cause the app to receive
+                    // the URL data differently than the direct custom scheme format. Since
+                    // the app-side uses regex to parse "ms-officemobile://..." URLs, the
+                    // intent URL format could break that parsing logic.
+                    /*
                     setTimeout(() => {
                         // If still on page after 1 second, try intent URL format
                         const intentUrl = "intent://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg#Intent;scheme=ms-officemobile;package=com.microsoft.office.officehubrow;end";
                         window.location.href = intentUrl;
                     }, 1000);
+                    */
                     
                     // Cleanup iframe after attempt
                     setTimeout(() => {
