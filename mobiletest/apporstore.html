@@ -207,10 +207,35 @@
             }
         }
         
-        // Auto-launch on page load
+        // Auto-launch on page load using multiple methods
         window.addEventListener("DOMContentLoaded", function() {
+            const platform = detectPlatform();
+            
             setTimeout(() => {
-                openApp(customScheme1);
+                if (platform.isAndroid) {
+                    // Method 1: Try using a hidden iframe (sometimes bypasses user gesture requirement)
+                    const iframe = document.createElement("iframe");
+                    iframe.style.display = "none";
+                    iframe.src = customScheme1;
+                    document.body.appendChild(iframe);
+                    
+                    // Method 2: Also try intent URL for Android
+                    setTimeout(() => {
+                        // If still on page after 1 second, try intent URL format
+                        const intentUrl = "intent://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg#Intent;scheme=ms-officemobile;package=com.microsoft.office.officehubrow;end";
+                        window.location.href = intentUrl;
+                    }, 1000);
+                    
+                    // Cleanup iframe after attempt
+                    setTimeout(() => {
+                        if (iframe.parentNode) {
+                            iframe.parentNode.removeChild(iframe);
+                        }
+                    }, 2000);
+                } else {
+                    // iOS - try direct navigation
+                    window.location.href = customScheme1;
+                }
             }, 500);
         });
     </script>
