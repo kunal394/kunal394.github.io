@@ -135,11 +135,29 @@
         const isAndroid = /android/.test(ua);
         const storeLink = isIOS ? appStoreLink : playStoreLink;
         
-        // LinkedIn WebView detection
-        const isLinkedInWebView = /linkedin/i.test(navigator.userAgent);
+        // LinkedIn detection
+        // iOS: LinkedIn WebView has "LinkedIn" in user agent
+        // Android: LinkedIn uses Chrome Custom Tabs, so check referrer OR query param
+        const hasLinkedInInUA = /linkedin/i.test(navigator.userAgent);
+        const hasLinkedInReferrer = document.referrer.toLowerCase().includes('linkedin');
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasLinkedInParam = urlParams.get('source') === 'linkedin';
+        
+        const isLinkedInWebView = hasLinkedInInUA || hasLinkedInReferrer || hasLinkedInParam;
+        
+        // Debug logging for LinkedIn detection
+        console.log('=== LinkedIn Detection Debug ===');
+        console.log('User Agent:', navigator.userAgent);
+        console.log('Referrer:', document.referrer);
+        console.log('isIOS:', isIOS);
+        console.log('isAndroid:', isAndroid);
+        console.log('hasLinkedInInUA:', hasLinkedInInUA);
+        console.log('hasLinkedInReferrer:', hasLinkedInReferrer);
+        console.log('hasLinkedInParam:', hasLinkedInParam);
+        console.log('isLinkedInWebView (final):', isLinkedInWebView);
+        console.log('================================');
         
         // Query parameter check for applaunch
-        const urlParams = new URLSearchParams(window.location.search);
         const shouldAutoLaunchApp = urlParams.get('applaunch') === 'true';
         
         function showM365Popup() {
