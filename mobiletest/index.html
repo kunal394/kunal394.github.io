@@ -131,6 +131,10 @@
         // LinkedIn WebView detection
         const isLinkedInWebView = /linkedin/i.test(navigator.userAgent);
         
+        // Query parameter check for applaunch
+        const urlParams = new URLSearchParams(window.location.search);
+        const shouldAutoLaunchApp = urlParams.get('applaunch') === 'true';
+        
         function showM365Popup() {
             document.getElementById('m365-modal').classList.add('show');
         }
@@ -144,10 +148,50 @@
             window.location.href = m365url;
         }
 
+        // Auto-launch app with store fallback
+        function autoLaunchApp() {
+            let appOpened = false;
+            
+            const visibilityHandler = function() {
+                if (document.hidden) {
+                    appOpened = true;
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                }
+            };
+            
+            document.addEventListener('visibilitychange', visibilityHandler);
+            
+            // Try to open the app via iframe (works better in webviews)
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = customScheme1;
+            document.body.appendChild(iframe);
+            
+            // Cleanup iframe after attempt
+            setTimeout(function() {
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+            }, 2000);
+            
+            // Fallback to App Store after 2.5 seconds if app didn't open
+            setTimeout(function() {
+                if (!appOpened && !document.hidden) {
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                    window.location.href = appStoreLink;
+                }
+            }, 2500);
+        }
+
         // Auto-show popup on page load only if in LinkedIn WebView
+        // Or auto-launch app if applaunch=true query param is present
         window.addEventListener("DOMContentLoaded", function() {
             if (isLinkedInWebView) {
-                showM365Popup();
+                if (shouldAutoLaunchApp) {
+                    autoLaunchApp();
+                } else {
+                    showM365Popup();
+                }
             }
         });
 
