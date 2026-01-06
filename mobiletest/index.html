@@ -61,6 +61,7 @@
         const customScheme4 = "ms-officemobile://apps/?appId=46525057-714b-43c4-84aa-d001ec464369&source=agentCenterDialog";
         const customScheme5 = "ms-officemobile://chat/try-voice-chat?uniquePromoId=59DAA93D-789E-48EC-BED8-A81FFBA053FB&ct=voice_share&ocid=voice_share&referrer=utm_source%3Dvoice_share%26utm_campaign%3Dvoice_share&ccac=tofqrcode";
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
+        const m365url = "https://m365.cloud.microsoft/chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         
         function openApp(schemeUrl) {
             const ua = navigator.userAgent.toLowerCase();
@@ -171,6 +172,7 @@
     <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(customScheme3)">Create</a>
     <a class="btn secondary" href="javascript:void(0)" onclick="openApp(customScheme4)">Skill Agent</a>
     <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme5)">Try Voice Chat</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="window.location.href=m365url">M365 Web</a>
 
 </body>
 </html>
