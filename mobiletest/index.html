@@ -175,35 +175,74 @@
 
         // Auto-launch app with store fallback
         function autoLaunchApp() {
+            console.log('=== autoLaunchApp() called ===');
+            console.log('customScheme1:', customScheme1);
+            console.log('storeLink:', storeLink);
+            console.log('isAndroid:', isAndroid);
+            console.log('isIOS:', isIOS);
+            
             let appOpened = false;
             
-            const visibilityHandler = function() {
-                if (document.hidden) {
+            const markAppOpened = function(source) {
+                if (!appOpened) {
                     appOpened = true;
-                    document.removeEventListener('visibilitychange', visibilityHandler);
+                    console.log('App opened detected via:', source);
                 }
             };
             
-            document.addEventListener('visibilitychange', visibilityHandler);
-            
-            // Try to open the app via iframe (works better in webviews)
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = customScheme1;
-            document.body.appendChild(iframe);
-            
-            // Cleanup iframe after attempt
-            setTimeout(function() {
-                if (iframe.parentNode) {
-                    iframe.parentNode.removeChild(iframe);
+            const visibilityHandler = function() {
+                console.log('visibilitychange fired, hidden:', document.hidden);
+                if (document.hidden) {
+                    markAppOpened('visibilitychange');
                 }
-            }, 2000);
+            };
             
-            // Fallback to App Store after 2.5 seconds if app didn't open
+            const pagehideHandler = function() {
+                console.log('pagehide fired');
+                markAppOpened('pagehide');
+            };
+            
+            const blurHandler = function() {
+                console.log('blur fired');
+                markAppOpened('blur');
+            };
+            
+            document.addEventListener('visibilitychange', visibilityHandler);
+            window.addEventListener('pagehide', pagehideHandler);
+            window.addEventListener('blur', blurHandler);
+            
+            // On Android, use window.location.href directly (works better in Chrome Custom Tabs)
+            // On iOS, use iframe (works better in WebViews)
+            if (isAndroid) {
+                console.log('Android: Using window.location.href for app launch');
+                window.location.href = customScheme1;
+            } else {
+                console.log('iOS: Using iframe for app launch');
+                // Try to open the app via iframe (works better in iOS webviews)
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = customScheme1;
+                document.body.appendChild(iframe);
+                
+                // Cleanup iframe after attempt
+                setTimeout(function() {
+                    if (iframe.parentNode) {
+                        iframe.parentNode.removeChild(iframe);
+                    }
+                }, 2000);
+            }
+            
+            // Fallback to store after 2.5 seconds if app didn't open
             setTimeout(function() {
+                console.log('Timeout check - appOpened:', appOpened, 'document.hidden:', document.hidden);
                 if (!appOpened && !document.hidden) {
+                    console.log('App did not open, redirecting to store:', storeLink);
                     document.removeEventListener('visibilitychange', visibilityHandler);
+                    window.removeEventListener('pagehide', pagehideHandler);
+                    window.removeEventListener('blur', blurHandler);
                     window.location.href = storeLink;
+                } else {
+                    console.log('App opened or page hidden, not redirecting to store');
                 }
             }, 2500);
         }
