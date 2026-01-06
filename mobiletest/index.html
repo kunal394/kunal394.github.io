@@ -141,6 +141,11 @@
             window.location.href = m365url;
         }
 
+        // Auto-show popup on page load
+        window.addEventListener("DOMContentLoaded", function() {
+            showM365Popup();
+        });
+
         function openApp(schemeUrl) {
             const ua = navigator.userAgent.toLowerCase();
             const isIOS = /iphone|ipad|ipod/.test(ua);
