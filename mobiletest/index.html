@@ -128,6 +128,9 @@
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
         const m365url = "https://m365.cloud.microsoft/chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         
+        // LinkedIn WebView detection
+        const isLinkedInWebView = /linkedin/i.test(navigator.userAgent);
+        
         function showM365Popup() {
             document.getElementById('m365-modal').classList.add('show');
         }
@@ -141,9 +144,11 @@
             window.location.href = m365url;
         }
 
-        // Auto-show popup on page load
+        // Auto-show popup on page load only if in LinkedIn WebView
         window.addEventListener("DOMContentLoaded", function() {
-            showM365Popup();
+            if (isLinkedInWebView) {
+                showM365Popup();
+            }
         });
 
         function openApp(schemeUrl) {
