@@ -93,221 +93,215 @@
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
         const playStoreLink = "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow";
         
-        function detectPlatform() {
-            const ua = navigator.userAgent.toLowerCase();
-            
-            const isIOS = /iphone|ipad|ipod/.test(ua);
-            const isAndroid = /android/.test(ua);
-            
+        // Timeout for smart app link attempt before falling back to store
+        const SMART_APP_LINK_TIMEOUT_MS = 2500;
+        
+        // Platform detection (done once at load)
+        const ua = navigator.userAgent.toLowerCase();
+        const isIOS = /iphone|ipad|ipod/.test(ua);
+        const isAndroid = /android/.test(ua);
+        const storeLink = isIOS ? appStoreLink : playStoreLink;
+        
+        /**
+         * Detect browser type for platform-specific handling
+         */
+        function detectBrowserInfo() {
             // Browser detection for iOS
-            const isSafari = isIOS && ua.includes("safari") && !ua.includes("crios") && !ua.includes("fxios") && !ua.includes("edgios");
-            const isChromeiOS = isIOS && ua.includes("crios");
-            const isEdgeiOS = isIOS && ua.includes("edgios");
+            const isSafari = isIOS && ua.includes('safari') && !ua.includes('crios') && !ua.includes('fxios') && !ua.includes('edgios') && !ua.includes('brave');
+            const isChromeiOS = isIOS && ua.includes('crios');
+            const isEdgeiOS = isIOS && ua.includes('edgios');
+            const isBraveiOS = isIOS && ua.includes('brave');
             
             // Browser detection for Android
-            const isChromeAndroid = isAndroid && ua.includes("chrome") && !ua.includes("edg");
-            const isEdgeAndroid = isAndroid && ua.includes("edg");
+            const isChromeAndroid = isAndroid && ua.includes('chrome') && !ua.includes('edg') && !ua.includes('brave');
+            const isEdgeAndroid = isAndroid && ua.includes('edg');
+            const isBraveAndroid = isAndroid && ua.includes('brave');
             
             return {
-                isIOS,
-                isAndroid,
-                isSafari,
-                isChromeiOS,
-                isEdgeiOS,
-                isChromeAndroid,
-                isEdgeAndroid,
-                storeLink: isIOS ? appStoreLink : playStoreLink
+                isSafari: isSafari,
+                isChromeiOS: isChromeiOS,
+                isEdgeiOS: isEdgeiOS,
+                isBraveiOS: isBraveiOS,
+                isChromeAndroid: isChromeAndroid,
+                isEdgeAndroid: isEdgeAndroid,
+                isBraveAndroid: isBraveAndroid
             };
         }
         
-        function openApp(schemeUrl) {
-            const platform = detectPlatform();
-            
-            let appOpened = false;
-            let fallbackTimeoutId = null;
-            
-            const cleanup = () => {
-                if (fallbackTimeoutId) clearTimeout(fallbackTimeoutId);
-                document.removeEventListener("visibilitychange", visibilityHandler);
-                window.removeEventListener("pagehide", pageHideHandler);
-            };
-            
-            const openStore = () => {
-                if (!appOpened) {
-                    cleanup();
-                    window.location.href = platform.storeLink;
+        /**
+         * Smart App Link - Attempts to open the app via custom scheme
+         * Returns a promise that resolves with { appOpened: boolean, shouldRedirect: boolean }
+         * The timeout timer has highest priority - will not resolve early even if fingerprinting completes
+         */
+        function attemptSmartAppLink(schemeUrl, storeUrl, onAppOpened) {
+            return new Promise(function(resolve) {
+                if (!schemeUrl) {
+                    resolve({ appOpened: false, shouldRedirect: true });
+                    return;
                 }
-            };
-            
-            const visibilityHandler = () => {
-                if (document.hidden) {
+                
+                const browserInfo = detectBrowserInfo();
+                let appOpened = false;
+                let fallbackTimeoutId = null;
+                let resolved = false;
+                
+                let cleanup = function() {
+                    if (fallbackTimeoutId) clearTimeout(fallbackTimeoutId);
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                    window.removeEventListener('pagehide', pageHideHandler);
+                };
+                
+                const resolveOnce = function(result) {
+                    if (!resolved) {
+                        resolved = true;
+                        cleanup();
+                        resolve(result);
+                    }
+                };
+                
+                const visibilityHandler = function() {
+                    if (document.hidden) {
+                        appOpened = true;
+                        console.log('Smart App Link: App opened (visibility change)');
+                        if (onAppOpened) onAppOpened();
+                        // Don't resolve yet - let the timer complete
+                    }
+                };
+                
+                const pageHideHandler = function() {
                     appOpened = true;
-                    cleanup();
-                }
-            };
-            
-            const pageHideHandler = () => {
-                appOpened = true;
-                cleanup();
-            };
-            
-            document.addEventListener("visibilitychange", visibilityHandler);
-            window.addEventListener("pagehide", pageHideHandler);
-            
-            if (platform.isIOS) {
-                // iOS handling - use iframe method for more reliable detection
-                if (platform.isSafari) {
-                    // Safari: Use location.href directly, it handles custom schemes well
-                    window.location.href = schemeUrl;
-                    
-                    fallbackTimeoutId = setTimeout(() => {
-                        if (!appOpened && !document.hidden) {
-                            openStore();
-                        }
-                    }, 2500);
-                    
-                } else if (platform.isChromeiOS || platform.isEdgeiOS) {
-                    // Chrome/Edge iOS: These show a confirmation dialog
-                    // Use blur/focus to detect if user interacted with prompt
+                    console.log('Smart App Link: App opened (pagehide)');
+                    if (onAppOpened) onAppOpened();
+                };
+                
+                document.addEventListener('visibilitychange', visibilityHandler);
+                window.addEventListener('pagehide', pageHideHandler);
+                
+                if (isIOS) {
+                    // All iOS browsers - use iframe approach to avoid error dialogs in Edge/Safari
+                    // Use blur/focus detection to know if user is interacting with prompt
                     let promptShown = false;
                     
-                    const blurHandler = () => {
+                    const blurHandler = function() {
                         promptShown = true;
-                        // Clear the fallback since user is seeing the prompt
                         if (fallbackTimeoutId) clearTimeout(fallbackTimeoutId);
+                        console.log('Smart App Link: Prompt detected (blur)');
                     };
                     
-                    const focusHandler = () => {
+                    const focusHandler = function() {
                         if (promptShown && !appOpened && !document.hidden) {
                             // User came back - they either cancelled or app isn't installed
-                            setTimeout(() => {
+                            // Use 1s delay to allow visibility change to fire first if app is opening
+                            setTimeout(function() {
                                 if (!document.hidden && !appOpened) {
-                                    openStore();
+                                    console.log('Smart App Link: User cancelled prompt or app not installed');
+                                    resolveOnce({ appOpened: false, shouldRedirect: true });
                                 }
-                            }, 300);
+                            }, 1000);
                         }
                     };
                     
-                    window.addEventListener("blur", blurHandler);
-                    window.addEventListener("focus", focusHandler);
+                    window.addEventListener('blur', blurHandler);
+                    window.addEventListener('focus', focusHandler);
                     
-                    // Also cleanup blur/focus handlers
+                    // Extend cleanup to include blur/focus handlers
                     const originalCleanup = cleanup;
-                    cleanup = () => {
+                    cleanup = function() {
                         originalCleanup();
-                        window.removeEventListener("blur", blurHandler);
-                        window.removeEventListener("focus", focusHandler);
+                        window.removeEventListener('blur', blurHandler);
+                        window.removeEventListener('focus', focusHandler);
                     };
                     
-                    window.location.href = schemeUrl;
-                    
-                    // Fallback if no prompt appears at all (app not installed, no prompt shown)
-                    fallbackTimeoutId = setTimeout(() => {
-                        if (!promptShown && !appOpened && !document.hidden) {
-                            openStore();
-                        }
-                    }, 2500);
-                    
-                } else {
-                    // Other iOS browsers (Firefox, in-app browsers, etc.)
-                    // Use simple approach with timeout fallback
-                    window.location.href = schemeUrl;
-                    
-                    fallbackTimeoutId = setTimeout(() => {
-                        if (!appOpened && !document.hidden) {
-                            openStore();
-                        }
-                    }, 2500);
-                }
-                
-            } else if (platform.isAndroid) {
-                // Android handling
-                // Android Chrome and Edge handle intents differently
-                // Using visibility change is generally reliable on Android
-                
-                window.location.href = schemeUrl;
-                
-                fallbackTimeoutId = setTimeout(() => {
-                    if (!appOpened && !document.hidden) {
-                        openStore();
-                    }
-                }, 2000);
-            } else {
-                // Desktop or unknown - just redirect to appropriate store
-                window.location.href = platform.storeLink;
-            }
-        }
-        
-        // Auto-launch on page load with store fallback
-        window.addEventListener("DOMContentLoaded", function() {
-            const platform = detectPlatform();
-            let appOpened = false;
-            
-            const openStore = () => {
-                if (!appOpened && !document.hidden) {
-                    // Hide spinner before redirecting
-                    const spinner = document.getElementById('spinner-container');
-                    if (spinner) spinner.classList.add('hidden');
-                    window.location.href = platform.storeLink;
-                }
-            };
-            
-            const visibilityHandler = () => {
-                if (document.hidden) {
-                    appOpened = true;
-                    document.removeEventListener("visibilitychange", visibilityHandler);
-                }
-            };
-            
-            document.addEventListener("visibilitychange", visibilityHandler);
-            
-            setTimeout(() => {
-                if (platform.isAndroid) {
-                    // Method 1: Try using a hidden iframe (sometimes bypasses user gesture requirement)
-                    const iframe = document.createElement("iframe");
-                    iframe.style.display = "none";
-                    iframe.src = customScheme1;
+                    // Use iframe approach to avoid error dialogs in some browsers (e.g., Edge, Safari)
+                    // If app is installed, it opens; if not, iframe fails silently
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = schemeUrl;
                     document.body.appendChild(iframe);
                     
-                    // Method 2: Intent URL for Android (COMMENTED OUT)
-                    // Why it was added: Intent URLs are the native Android way to launch apps
-                    // and can sometimes work when custom schemes fail for auto-launch.
-                    // Why it's commented: The intent URL format may cause the app to receive
-                    // the URL data differently than the direct custom scheme format. Since
-                    // the app-side uses regex to parse "ms-officemobile://..." URLs, the
-                    // intent URL format could break that parsing logic.
-                    /*
-                    setTimeout(() => {
-                        // If still on page after 1 second, try intent URL format
-                        const intentUrl = "intent://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg#Intent;scheme=ms-officemobile;package=com.microsoft.office.officehubrow;end";
-                        window.location.href = intentUrl;
-                    }, 1000);
-                    */
-                    
                     // Cleanup iframe after attempt
-                    setTimeout(() => {
+                    setTimeout(function() {
                         if (iframe.parentNode) {
                             iframe.parentNode.removeChild(iframe);
                         }
                     }, 2000);
                     
-                    // Fallback to Play Store if app doesn't open
-                    setTimeout(() => {
-                        openStore();
-                    }, 2500);
+                    console.log('Smart App Link: Launched custom scheme via iframe (iOS)');
                     
-                } else if (platform.isIOS) {
-                    // iOS - try direct navigation
-                    window.location.href = customScheme1;
+                    // Fallback timer - only fires if no prompt appears at all
+                    fallbackTimeoutId = setTimeout(function() {
+                        if (!promptShown && !appOpened && !document.hidden) {
+                            console.log('Smart App Link: Timer expired, no prompt shown (iOS)');
+                            resolveOnce({ appOpened: false, shouldRedirect: true });
+                        } else if (appOpened || document.hidden) {
+                            console.log('Smart App Link: Timer expired, app was opened (iOS)');
+                            resolveOnce({ appOpened: true, shouldRedirect: false });
+                        }
+                        // If promptShown but not resolved, wait for focus handler
+                    }, SMART_APP_LINK_TIMEOUT_MS);
                     
-                    // Fallback to App Store if app doesn't open
-                    setTimeout(() => {
-                        openStore();
-                    }, 2500);
+                } else if (isAndroid) {
+                    // Android handling - use iframe method (works reliably)
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = schemeUrl;
+                    document.body.appendChild(iframe);
+                    console.log('Smart App Link: Launched custom scheme via iframe (Android)');
+                    
+                    // Cleanup iframe after attempt
+                    setTimeout(function() {
+                        if (iframe.parentNode) {
+                            iframe.parentNode.removeChild(iframe);
+                        }
+                    }, 2000);
+                    
+                    // Timeout timer
+                    fallbackTimeoutId = setTimeout(function() {
+                        if (!appOpened && !document.hidden) {
+                            console.log('Smart App Link: Timer expired, app not opened (Android)');
+                            resolveOnce({ appOpened: false, shouldRedirect: true });
+                        } else {
+                            console.log('Smart App Link: Timer expired, app was opened (Android)');
+                            resolveOnce({ appOpened: true, shouldRedirect: false });
+                        }
+                    }, SMART_APP_LINK_TIMEOUT_MS);
+                    
                 } else {
-                    // Desktop or unknown - go directly to store
-                    openStore();
+                    // Desktop or unknown - skip smart app link
+                    console.log('Smart App Link: Not a mobile device, skipping');
+                    resolveOnce({ appOpened: false, shouldRedirect: true });
                 }
+            });
+        }
+        
+        /**
+         * Open app with store fallback (for button clicks)
+         */
+        function openApp(schemeUrl) {
+            attemptSmartAppLink(schemeUrl, storeLink, null).then(function(result) {
+                if (result.shouldRedirect) {
+                    window.location.href = storeLink;
+                }
+            });
+        }
+        
+        /**
+         * Auto-launch on page load with store fallback
+         */
+        window.addEventListener("DOMContentLoaded", function() {
+            const hideSpinner = function() {
+                const spinner = document.getElementById('spinner-container');
+                if (spinner) spinner.classList.add('hidden');
+            };
+            
+            // Small delay to ensure page is fully loaded
+            setTimeout(function() {
+                attemptSmartAppLink(customScheme1, storeLink, null).then(function(result) {
+                    if (result.shouldRedirect) {
+                        hideSpinner();
+                        window.location.href = storeLink;
+                    }
+                });
             }, 500);
         });
     </script>
