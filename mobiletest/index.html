@@ -163,6 +163,12 @@
         }
         
         function updateDebugPanel() {
+            // Wait for body to exist
+            if (!document.body) {
+                document.addEventListener('DOMContentLoaded', updateDebugPanel);
+                return;
+            }
+            
             let panel = document.getElementById('debug-panel');
             if (!panel) {
                 panel = document.createElement('div');
