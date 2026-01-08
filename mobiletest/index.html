@@ -148,7 +148,44 @@
         
         const isLinkedInWebView = hasLinkedInInUA || hasLinkedInReferrer || hasLinkedInParam;
         
-        // Debug logging for LinkedIn detection
+        // ============================================
+        // DEBUG MODE - Add ?debug=true to see on-screen logs
+        // ============================================
+        const debugMode = urlParams.get('debug') === 'true';
+        let debugLogs = [];
+        
+        function debugLog(message) {
+            console.log('[DEBUG] ' + message);
+            if (debugMode) {
+                debugLogs.push(new Date().toISOString().substr(11, 12) + ' - ' + message);
+                updateDebugPanel();
+            }
+        }
+        
+        function updateDebugPanel() {
+            let panel = document.getElementById('debug-panel');
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.id = 'debug-panel';
+                panel.style.cssText = 'position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;padding:10px;max-height:40vh;overflow-y:auto;z-index:99999;white-space:pre-wrap;word-break:break-all;';
+                document.body.appendChild(panel);
+            }
+            panel.textContent = debugLogs.join('\n');
+            panel.scrollTop = panel.scrollHeight;
+        }
+        
+        // Log initial detection info
+        debugLog('User Agent: ' + navigator.userAgent);
+        debugLog('Referrer: ' + document.referrer);
+        debugLog('isIOS: ' + isIOS);
+        debugLog('isAndroid: ' + isAndroid);
+        debugLog('hasLinkedInInUA: ' + hasLinkedInInUA);
+        debugLog('hasLinkedInReferrer: ' + hasLinkedInReferrer);
+        debugLog('hasLinkedInParam: ' + hasLinkedInParam);
+        debugLog('isLinkedInWebView (final): ' + isLinkedInWebView);
+        debugLog('shouldAutoLaunchApp: ' + urlParams.get('applaunch'));
+        
+        // Debug logging for LinkedIn detection (console only)
         console.log('=== LinkedIn Detection Debug ===');
         console.log('User Agent:', navigator.userAgent);
         console.log('Referrer:', document.referrer);
@@ -178,35 +215,35 @@
 
         // Auto-launch app with store fallback
         function autoLaunchApp() {
-            console.log('=== autoLaunchApp() called ===');
-            console.log('customScheme8:', customScheme8);
-            console.log('storeLink:', storeLink);
-            console.log('isAndroid:', isAndroid);
-            console.log('isIOS:', isIOS);
+            debugLog('=== autoLaunchApp() called ===');
+            debugLog('customScheme8: ' + customScheme8);
+            debugLog('storeLink: ' + storeLink);
+            debugLog('isAndroid: ' + isAndroid);
+            debugLog('isIOS: ' + isIOS);
             
             let appOpened = false;
             
             const markAppOpened = function(source) {
                 if (!appOpened) {
                     appOpened = true;
-                    console.log('App opened detected via:', source);
+                    debugLog('App opened detected via: ' + source);
                 }
             };
             
             const visibilityHandler = function() {
-                console.log('visibilitychange fired, hidden:', document.hidden);
+                debugLog('visibilitychange fired, hidden: ' + document.hidden);
                 if (document.hidden) {
                     markAppOpened('visibilitychange');
                 }
             };
             
             const pagehideHandler = function() {
-                console.log('pagehide fired');
+                debugLog('pagehide fired');
                 markAppOpened('pagehide');
             };
             
             const blurHandler = function() {
-                console.log('blur fired');
+                debugLog('blur fired');
                 markAppOpened('blur');
             };
             
@@ -217,35 +254,37 @@
             // On Android, use window.location.href directly (works better in Chrome Custom Tabs)
             // On iOS, use iframe (works better in WebViews)
             if (isAndroid) {
-                console.log('Android: Using window.location.href for app launch');
+                debugLog('Android: Using window.location.href for app launch');
                 window.location.href = customScheme8;
             } else {
-                console.log('iOS: Using iframe for app launch');
+                debugLog('iOS: Using iframe for app launch');
                 // Try to open the app via iframe (works better in iOS webviews)
                 const iframe = document.createElement('iframe');
                 iframe.style.display = 'none';
                 iframe.src = customScheme8;
                 document.body.appendChild(iframe);
+                debugLog('Iframe created with src: ' + customScheme8);
                 
                 // Cleanup iframe after attempt
                 setTimeout(function() {
                     if (iframe.parentNode) {
                         iframe.parentNode.removeChild(iframe);
+                        debugLog('Iframe removed after 2s');
                     }
                 }, 2000);
             }
             
             // Fallback to store after 2.5 seconds if app didn't open
             setTimeout(function() {
-                console.log('Timeout check - appOpened:', appOpened, 'document.hidden:', document.hidden);
+                debugLog('Timeout check - appOpened: ' + appOpened + ', hidden: ' + document.hidden);
                 if (!appOpened && !document.hidden) {
-                    console.log('App did not open, redirecting to store:', storeLink);
+                    debugLog('App did not open, redirecting to store: ' + storeLink);
                     document.removeEventListener('visibilitychange', visibilityHandler);
                     window.removeEventListener('pagehide', pagehideHandler);
                     window.removeEventListener('blur', blurHandler);
                     window.location.href = storeLink;
                 } else {
-                    console.log('App opened or page hidden, not redirecting to store');
+                    debugLog('App opened or page hidden, not redirecting to store');
                 }
             }, 2500);
         }
@@ -253,8 +292,13 @@
         // Auto-show popup on page load only if in LinkedIn WebView
         // Or auto-launch app if applaunch=true query param is present
         window.addEventListener("DOMContentLoaded", function() {
+            debugLog('DOMContentLoaded fired');
+            debugLog('isLinkedInWebView: ' + isLinkedInWebView);
+            debugLog('shouldAutoLaunchApp: ' + shouldAutoLaunchApp);
+            
             if (isLinkedInWebView) {
                 if (shouldAutoLaunchApp) {
+                    debugLog('Triggering autoLaunchApp()');
                     autoLaunchApp();
                 } else {
                     showM365Popup();
