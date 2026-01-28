@@ -120,13 +120,12 @@
     </style>
 
     <script>
-        const customScheme1 = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-        const customScheme2 = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-        const customScheme3 = "ms-officemobile://create?fromcode=cmm56zfqvf0&utm_campaign=paidmktgcreateurl&utm_source=deeplink&ct=paidmktgcreateurl&ccac=create&ocid=paidmktgcreateurl";
-        const customScheme4 = "ms-officemobile://apps/?appId=46525057-714b-43c4-84aa-d001ec464369&source=agentCenterDialog";
-        const customScheme5 = "ms-officemobile://chat/try-voice-chat?uniquePromoId=59DAA93D-789E-48EC-BED8-A81FFBA053FB&ct=voice_share&ocid=voice_share&referrer=utm_source%3Dvoice_share%26utm_campaign%3Dvoice_share&ccac=tofqrcode";
-        const customScheme6 = "ms-officemobile://apps/?titleId=P_8cfc4e6f-267e-db15-c6e7-3fc47a54f61e";
-        const customScheme7 = "ms-officemobile://apps/?templatedAppId=9e2962b8-7eae-4124-86f3-1799090725e1&templateInstanceId=1bf9ca90-5554-4487-af85-0a9b97c8c80f&environment=839eace6-59ab-4243-97ec-a5b8fcc104e4&source=embedded-builder";
+        const agentCustomScheme1 = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const chatWithPromptCustomScheme = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const createCustomScheme = "ms-officemobile://create?fromcode=cmm56zfqvf0&utm_campaign=paidmktgcreateurl&utm_source=deeplink&ct=paidmktgcreateurl&ccac=create&ocid=paidmktgcreateurl";
+        const agentCustomScheme2 = "ms-officemobile://apps/?appId=46525057-714b-43c4-84aa-d001ec464369&source=agentCenterDialog";
+        const voiceChatCustomScheme = "ms-officemobile://apps/?titleId=P_8cfc4e6f-267e-db15-c6e7-3fc47a54f61e";
+        const agentCustomScheme3 = "ms-officemobile://apps/?templatedAppId=9e2962b8-7eae-4124-86f3-1799090725e1&templateInstanceId=1bf9ca90-5554-4487-af85-0a9b97c8c80f&environment=839eace6-59ab-4243-97ec-a5b8fcc104e4&source=embedded-builder";
         const customScheme8 = "ms-officemobile://chat/?testppeddls=true&ccac=1&solution=2&debug=true";
         const customScheme9 = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/ewogICJpZCI6ICJUV2xqY205emIyWjBTR0Z1WkU5bVpsWTFmRFF3TlRrd1ptSmhMV1F3TkdFdE5HWTROaTA1WVdVd0xXRmhNbVl3TXpnek5qVTJNbnhsYmkxMWN3JTNkJTNkIiwKICAic2NlbmFyaW8iOiAic2hhcmVMaW5rIiwKICAicHJvcGVydGllcyI6IHsKICAgICJjbGlja1RpbWVzdGFtcCI6ICIyMDI2LTA5LTA5VDE4OjA1OjA4LjA2OFoiCiAgfSwKICAiY29ycmVsYXRpb25JZCI6ICJkMWZmMGVmYy0wMmZkLTQ3NmQtOTIzNi1lMGI0NGQ3NDE4ZTkiLAogICJ2ZXJzaW9uIjogMS4xLAogICJncHRJbmZvIjogewogICAgImdwdElkIjogImU2ZDAzODI1LTNmY2ItNGM4Yi05MDVmLTdjODBlOTY3OGNiZCIKICB9Cn0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         const newSchemeTestLink = "m365app://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
@@ -134,6 +133,13 @@
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
         const playStoreLink = "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow";
         const m365url = "https://m365.cloud.microsoft/chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+
+        const agentLatestCustomScheme1 = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const chatWithPromptLatestCustomScheme = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const createLatestCustomScheme = "ms-officemobile://create?fromcode=cmm56zfqvf0&utm_campaign=paidmktgcreateurl&utm_source=deeplink&ct=paidmktgcreateurl&ccac=create&ocid=paidmktgcreateurl";
+        const agentLatestCustomScheme2 = "ms-officemobile://apps/?appId=46525057-714b-43c4-84aa-d001ec464369&source=agentCenterDialog";
+        const voiceChatLatestCustomScheme = "ms-officemobile://apps/?titleId=P_8cfc4e6f-267e-db15-c6e7-3fc47a54f61e";
+        const agentLatestCustomScheme3 = "ms-officemobile://apps/?templatedAppId=9e2962b8-7eae-4124-86f3-1799090725e1&templateInstanceId=1bf9ca90-5554-4487-af85-0a9b97c8c80f&environment=839eace6-59ab-4243-97ec-a5b8fcc104e4&source=embedded-builder";
         
         // Platform detection
         const ua = navigator.userAgent.toLowerCase();
@@ -193,7 +199,7 @@
         debugLog('hasLinkedInParam: ' + hasLinkedInParam);
         debugLog('isLinkedInWebView (final): ' + isLinkedInWebView);
         debugLog('shouldAutoLaunchApp: ' + urlParams.get('applaunch'));
-        debugLog('App launch URL (customScheme10): ' + customScheme10);
+        debugLog('App launch URL: ' + chatWithPromptLatestCustomScheme);
         
         // Debug logging for LinkedIn detection (console only)
         console.log('=== LinkedIn Detection Debug ===');
@@ -226,7 +232,7 @@
         // Auto-launch app with store fallback
         function autoLaunchApp() {
             debugLog('=== autoLaunchApp() called ===');
-            debugLog('customScheme10: ' + customScheme10);
+            debugLog('chatWithPromptLatestCustomScheme: ' + chatWithPromptLatestCustomScheme);
             debugLog('storeLink: ' + storeLink);
             debugLog('isAndroid: ' + isAndroid);
             debugLog('isIOS: ' + isIOS);
@@ -265,15 +271,15 @@
             // On iOS, use iframe (works better in WebViews)
             if (isAndroid) {
                 debugLog('Android: Using window.location.href for app launch');
-                window.location.href = customScheme10;
+                window.location.href = chatWithPromptLatestCustomScheme;
             } else {
                 debugLog('iOS: Using iframe for app launch');
                 // Try to open the app via iframe (works better in iOS webviews)
                 const iframe = document.createElement('iframe');
                 iframe.style.display = 'none';
-                iframe.src = customScheme10;
+                iframe.src = chatWithPromptLatestCustomScheme;
                 document.body.appendChild(iframe);
-                debugLog('Iframe created with src: ' + customScheme10);
+                debugLog('Iframe created with src: ' + chatWithPromptLatestCustomScheme);
                 
                 // Cleanup iframe after attempt
                 setTimeout(function() {
@@ -401,16 +407,25 @@
     <p>You can open this page directly in the app for a better experience.</p>
 
     <!-- Three Buttons -->
-    <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme1)">Researcher</a>
-    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(customScheme2)">Chat with Prompt</a>
-    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(customScheme3)">Create</a>
-    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(customScheme4)">Skill Agent</a>
-    <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme5)">Try Voice Chat</a>
-    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(customScheme6)">Analyst</a>
+    <a class="btn" href="javascript:void(0)" onclick="openApp(agentCustomScheme1)">Researcher</a>
+    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(chatWithPromptCustomScheme)">Chat with Prompt</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(createCustomScheme)">Create</a>
+    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(agentCustomScheme2)">Skill Agent</a>
+    <a class="btn" href="javascript:void(0)" onclick="openApp(voiceChatCustomScheme)">Try Voice Chat</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(agentCustomScheme3)">Analyst</a>
     <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme9)">Researcher with prompt</a>
-    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(customScheme7)">Template App ID</a>
+    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(agentCustomScheme3)">Template App ID</a>
     <a class="btn" href="javascript:void(0)" onclick="openApp(newSchemeTestLink)">New Scheme Test Link</a>
     <a class="btn tertiary" href="javascript:void(0)" onclick="showM365Popup()">M365 Web</a>
+
+    <!-- Latest Custom Scheme Buttons -->
+    <h3 style="margin-top: 30px;">Latest Custom Schemes</h3>
+    <a class="btn" href="javascript:void(0)" onclick="openApp(agentLatestCustomScheme1)">Agent Latest 1</a>
+    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(chatWithPromptLatestCustomScheme)">Chat with Prompt Latest</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(createLatestCustomScheme)">Create Latest</a>
+    <a class="btn secondary" href="javascript:void(0)" onclick="openApp(agentLatestCustomScheme2)">Agent Latest 2</a>
+    <a class="btn" href="javascript:void(0)" onclick="openApp(voiceChatLatestCustomScheme)">Voice Chat Latest</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(agentLatestCustomScheme3)">Agent Latest 3</a>
 
     <!-- M365 Popup Modal -->
     <div id="m365-modal" class="modal-overlay">
