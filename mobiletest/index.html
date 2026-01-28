@@ -134,12 +134,12 @@
         const playStoreLink = "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow";
         const m365url = "https://m365.cloud.microsoft/chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
 
-        const agentLatestCustomScheme1 = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-        const chatWithPromptLatestCustomScheme = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-        const createLatestCustomScheme = "ms-officemobile://create?fromcode=cmm56zfqvf0&utm_campaign=paidmktgcreateurl&utm_source=deeplink&ct=paidmktgcreateurl&ccac=create&ocid=paidmktgcreateurl";
-        const agentLatestCustomScheme2 = "ms-officemobile://apps/?appId=46525057-714b-43c4-84aa-d001ec464369&source=agentCenterDialog";
-        const voiceChatLatestCustomScheme = "ms-officemobile://apps/?titleId=P_8cfc4e6f-267e-db15-c6e7-3fc47a54f61e";
-        const agentLatestCustomScheme3 = "ms-officemobile://apps/?templatedAppId=9e2962b8-7eae-4124-86f3-1799090725e1&templateInstanceId=1bf9ca90-5554-4487-af85-0a9b97c8c80f&environment=839eace6-59ab-4243-97ec-a5b8fcc104e4&source=embedded-builder";
+        const agentLatestCustomScheme1 = "ms-m365copilot://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const chatWithPromptLatestCustomScheme = "ms-m365copilot://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
+        const createLatestCustomScheme = "ms-m365copilot://create?fromcode=cmm56zfqvf0&utm_campaign=paidmktgcreateurl&utm_source=deeplink&ct=paidmktgcreateurl&ccac=create&ocid=paidmktgcreateurl";
+        const agentLatestCustomScheme2 = "ms-m365copilot://apps/?appId=46525057-714b-43c4-84aa-d001ec464369&source=agentCenterDialog";
+        const voiceChatLatestCustomScheme = "ms-m365copilot://apps/?titleId=P_8cfc4e6f-267e-db15-c6e7-3fc47a54f61e";
+        const agentLatestCustomScheme3 = "ms-m365copilot://apps/?templatedAppId=9e2962b8-7eae-4124-86f3-1799090725e1&templateInstanceId=1bf9ca90-5554-4487-af85-0a9b97c8c80f&environment=839eace6-59ab-4243-97ec-a5b8fcc104e4&source=embedded-builder";
         
         // Platform detection
         const ua = navigator.userAgent.toLowerCase();
@@ -182,7 +182,7 @@
             if (!panel) {
                 panel = document.createElement('div');
                 panel.id = 'debug-panel';
-                panel.style.cssText = 'position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;padding:10px;max-height:40vh;overflow-y:auto;z-index:99999;white-space:pre-wrap;word-break:break-all;';
+                panel.style.cssText = 'position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;padding:10px;max-height:20vh;overflow-y:auto;z-index:99999;white-space:pre-wrap;word-break:break-all;';
                 document.body.appendChild(panel);
             }
             panel.textContent = debugLogs.join('\n');
