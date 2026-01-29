@@ -128,7 +128,6 @@
         const agentCustomScheme3 = "ms-officemobile://apps/?templatedAppId=9e2962b8-7eae-4124-86f3-1799090725e1&templateInstanceId=1bf9ca90-5554-4487-af85-0a9b97c8c80f&environment=839eace6-59ab-4243-97ec-a5b8fcc104e4&source=embedded-builder";
         const customScheme8 = "ms-officemobile://chat/?testppeddls=true&ccac=1&solution=2&debug=true";
         const customScheme9 = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/ewogICJpZCI6ICJUV2xqY205emIyWjBTR0Z1WkU5bVpsWTFmRFF3TlRrd1ptSmhMV1F3TkdFdE5HWTROaTA1WVdVd0xXRmhNbVl3TXpnek5qVTJNbnhsYmkxMWN3JTNkJTNkIiwKICAic2NlbmFyaW8iOiAic2hhcmVMaW5rIiwKICAicHJvcGVydGllcyI6IHsKICAgICJjbGlja1RpbWVzdGFtcCI6ICIyMDI2LTA5LTA5VDE4OjA1OjA4LjA2OFoiCiAgfSwKICAiY29ycmVsYXRpb25JZCI6ICJkMWZmMGVmYy0wMmZkLTQ3NmQtOTIzNi1lMGI0NGQ3NDE4ZTkiLAogICJ2ZXJzaW9uIjogMS4xLAogICJncHRJbmZvIjogewogICAgImdwdElkIjogImU2ZDAzODI1LTNmY2ItNGM4Yi05MDVmLTdjODBlOTY3OGNiZCIKICB9Cn0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
-        const newSchemeTestLink = "m365app://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/eyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05USTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         const customScheme10 = "ms-m365copilot://chat/?testppeddls=true&ccac=1&solution=2&debug=true";
         const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
         const playStoreLink = "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow";
@@ -140,6 +139,7 @@
         const agentLatestCustomScheme2 = "ms-m365copilot://apps/?appId=46525057-714b-43c4-84aa-d001ec464369&source=agentCenterDialog";
         const voiceChatLatestCustomScheme = "ms-m365copilot://apps/?titleId=P_8cfc4e6f-267e-db15-c6e7-3fc47a54f61e";
         const agentLatestCustomScheme3 = "ms-m365copilot://apps/?templatedAppId=9e2962b8-7eae-4124-86f3-1799090725e1&templateInstanceId=1bf9ca90-5554-4487-af85-0a9b97c8c80f&environment=839eace6-59ab-4243-97ec-a5b8fcc104e4&source=embedded-builder";
+        const newCustomScheme9 = "ms-officemobile://chat/entity1-d870f6cd-4aa5-4d42-9626-ab690c041429/ewogICJpZCI6ICJUV2xqY205emIyWjBTR0Z1WkU5bVpsWTFmRFF3TlRrd1ptSmhMV1F3TkdFdE5HWTROaTA1WVdVd0xXRmhNbVl3TXpnek5qVTJNbnhsYmkxMWN3JTNkJTNkIiwKICAic2NlbmFyaW8iOiAic2hhcmVMaW5rIiwKICAicHJvcGVydGllcyI6IHsKICAgICJjbGlja1RpbWVzdGFtcCI6ICIyMDI2LTA5LTA5VDE4OjA1OjA4LjA2OFoiCiAgfSwKICAiY29ycmVsYXRpb25JZCI6ICJkMWZmMGVmYy0wMmZkLTQ3NmQtOTIzNi1lMGI0NGQ3NDE4ZTkiLAogICJ2ZXJzaW9uIjogMS4xLAogICJncHRJbmZvIjogewogICAgImdwdElkIjogImU2ZDAzODI1LTNmY2ItNGM4Yi05MDVmLTdjODBlOTY3OGNiZCIKICB9Cn0?fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         
         // Platform detection
         const ua = navigator.userAgent.toLowerCase();
@@ -415,7 +415,6 @@
     <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(agentCustomScheme3)">Analyst</a>
     <a class="btn" href="javascript:void(0)" onclick="openApp(customScheme9)">Researcher with prompt</a>
     <a class="btn secondary" href="javascript:void(0)" onclick="openApp(agentCustomScheme3)">Template App ID</a>
-    <a class="btn" href="javascript:void(0)" onclick="openApp(newSchemeTestLink)">New Scheme Test Link</a>
     <a class="btn tertiary" href="javascript:void(0)" onclick="showM365Popup()">M365 Web</a>
 
     <!-- Latest Custom Scheme Buttons -->
@@ -425,7 +424,8 @@
     <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(createLatestCustomScheme)">Create Latest</a>
     <a class="btn secondary" href="javascript:void(0)" onclick="openApp(agentLatestCustomScheme2)">Agent Latest 2</a>
     <a class="btn" href="javascript:void(0)" onclick="openApp(voiceChatLatestCustomScheme)">Voice Chat Latest</a>
-    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(agentLatestCustomScheme3)">Agent Latest 3</a>
+    <a class="btn" href="javascript:void(0)" onclick="openApp(newCustomScheme9)">Researcher with Prompt</a>
+    <a class="btn tertiary" href="javascript:void(0)" onclick="openApp(agentLatestCustomScheme3)">Template App ID</a>
 
     <!-- M365 Popup Modal -->
     <div id="m365-modal" class="modal-overlay">
