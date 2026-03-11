@@ -1,0 +1,26 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.microsoft.office.word",
+      "sha256_cert_fingerprints": [
+        "3C:40:49:CD:CB:F1:98:A6:DD:4C:5B:95:69:63:E3:6C:48:C8:07:B3:C2:9E:2E:2C:61:D4:45:13:F4:C1:E8:40",
+        "B9:25:13:6F:3E:A7:C0:A1:95:16:90:A1:AB:31:39:10:DA:81:F4:09:94:A8:53:42:EC:62:28:88:F1:28:70:51",
+        "1F:B4:DE:76:0F:40:F3:0E:66:D3:08:51:8A:1B:D9:D1:4E:F1:41:1B:FF:A9:D6:76:28:76:B6:02:66:1D:54:ED"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.microsoft.office.officehubrow",
+      "sha256_cert_fingerprints": [
+        "3C:40:49:CD:CB:F1:98:A6:DD:4C:5B:95:69:63:E3:6C:48:C8:07:B3:C2:9E:2E:2C:61:D4:45:13:F4:C1:E8:40",
+        "B9:25:13:6F:3E:A7:C0:A1:95:16:90:A1:AB:31:39:10:DA:81:F4:09:94:A8:53:42:EC:62:28:88:F1:28:70:51",
+        "1F:B4:DE:76:0F:40:F3:0E:66:D3:08:51:8A:1B:D9:D1:4E:F1:41:1B:FF:A9:D6:76:28:76:B6:02:66:1D:54:ED"
+      ]
+    }
+  }
+]
