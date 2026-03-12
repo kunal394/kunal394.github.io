@@ -22,7 +22,7 @@
         ]
       },
       {
-        "appIDs": ["SGGM6D27TK.com.microsoft.officemobile"],
+        "appIDs": ["SGGM6D27TK.com.microsoft.officemobile", "9KBH5RKYEW.com.microsoft.officemobile-dogfood"],
         "components": [
           { "/": "/d/copilot/*", "comment": "Copilot deep links" }
         ]
