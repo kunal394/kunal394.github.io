@@ -22,7 +22,7 @@
         ]
       },
       {
-        "appIDs": ["SGGM6D27TK.com.microsoft.copilot"],
+        "appIDs": ["SGGM6D27TK.com.microsoft.officemobile"],
         "components": [
           { "/": "/d/copilot/*", "comment": "Copilot deep links" }
         ]
