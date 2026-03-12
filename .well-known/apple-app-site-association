@@ -1,0 +1,32 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["UBF8T346G9.com.microsoft.Office"],
+        "components": [
+          { "/": "/d/word/*",       "comment": "Word deep links" },
+          { "/": "/d/excel/*",      "comment": "Excel deep links" },
+          { "/": "/d/powerpoint/*", "comment": "PowerPoint deep links" }
+        ]
+      },
+      {
+        "appIDs": ["UBF8T346G9.com.microsoft.skype.teams"],
+        "components": [
+          { "/": "/d/teams/*", "comment": "Teams deep links" }
+        ]
+      },
+      {
+        "appIDs": ["UBF8T346G9.com.microsoft.onenote"],
+        "components": [
+          { "/": "/d/onenote/*", "comment": "OneNote deep links" }
+        ]
+      },
+      {
+        "appIDs": ["SGGM6D27TK.com.microsoft.copilot"],
+        "components": [
+          { "/": "/d/copilot/*", "comment": "Copilot deep links" }
+        ]
+      }
+    ]
+  }
+}
