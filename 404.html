@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Redirecting…</title>
+    <script>
+        // Redirect all /d/* paths to the devtunnel, preserving the full path and query string.
+        var tunnelBase = 'https://kpmm2j63-5000.inc1.devtunnels.ms';
+        var path = window.location.pathname;
+        var query = window.location.search;
+
+        if (path.startsWith('/d/')) {
+            window.location.replace(tunnelBase + path + query);
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting…</p>
+</body>
+</html>
