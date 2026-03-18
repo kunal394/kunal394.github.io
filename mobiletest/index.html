@@ -168,8 +168,9 @@
         const hasLinkedInReferrer = document.referrer.toLowerCase().includes('linkedin');
         const urlParams = new URLSearchParams(window.location.search);
         const hasLinkedInParam = urlParams.get('source') === 'linkedin';
+        const hasAutoAppRedirect = urlParams.get('autoappredirect') === 'true';
         
-        const isLinkedInWebView = hasLinkedInInUA || hasLinkedInReferrer || hasLinkedInParam;
+        const isLinkedInWebView = hasLinkedInInUA || hasLinkedInReferrer || hasLinkedInParam || hasAutoAppRedirect;
         
         // ============================================
         // DEBUG MODE - Add ?debug=true to see on-screen logs
