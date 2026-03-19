@@ -283,26 +283,45 @@
             window.addEventListener('blur', blurHandler);
             
             // On Android, use window.location.href directly (works better in Chrome Custom Tabs)
-            // On iOS, use iframe with delay (works better in WebViews for silent launch)
+            // On iOS, try multiple approaches for silent app launch
             if (isAndroid) {
                 debugLog('Android: Using window.location.href for app launch');
                 window.location.href = chatWithPromptLatestCustomScheme;
             } else {
-                debugLog('iOS: Using iframe for app launch (with 500ms delay)');
+                debugLog('iOS: Attempting silent app launch (3 methods)');
                 setTimeout(function() {
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.src = chatWithPromptLatestCustomScheme;
-                    document.body.appendChild(iframe);
-                    debugLog('Iframe created with src: ' + chatWithPromptLatestCustomScheme);
+                    // Method 1: Programmatic <a> click (bypasses some WebView restrictions)
+                    debugLog('iOS Method 1: Programmatic <a> click');
+                    var link = document.createElement('a');
+                    link.href = chatWithPromptLatestCustomScheme;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                     
-                    // Cleanup iframe after attempt
+                    // Method 2: iframe (legacy fallback)
                     setTimeout(function() {
-                        if (iframe.parentNode) {
-                            iframe.parentNode.removeChild(iframe);
-                            debugLog('Iframe removed after 2s');
+                        if (!appOpened && !document.hidden) {
+                            debugLog('iOS Method 2: iframe fallback');
+                            var iframe = document.createElement('iframe');
+                            iframe.style.display = 'none';
+                            iframe.src = chatWithPromptLatestCustomScheme;
+                            document.body.appendChild(iframe);
+                            setTimeout(function() {
+                                if (iframe.parentNode) {
+                                    iframe.parentNode.removeChild(iframe);
+                                }
+                            }, 2000);
                         }
-                    }, 2000);
+                    }, 300);
+                    
+                    // Method 3: window.location.replace (another variant)
+                    setTimeout(function() {
+                        if (!appOpened && !document.hidden) {
+                            debugLog('iOS Method 3: location.replace');
+                            window.location.replace(chatWithPromptLatestCustomScheme);
+                        }
+                    }, 800);
                 }, 500);
             }
             
