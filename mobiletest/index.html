@@ -283,26 +283,27 @@
             window.addEventListener('blur', blurHandler);
             
             // On Android, use window.location.href directly (works better in Chrome Custom Tabs)
-            // On iOS, use iframe (works better in WebViews)
+            // On iOS, use iframe with delay (works better in WebViews for silent launch)
             if (isAndroid) {
                 debugLog('Android: Using window.location.href for app launch');
                 window.location.href = chatWithPromptLatestCustomScheme;
             } else {
-                debugLog('iOS: Using iframe for app launch');
-                // Try to open the app via iframe (works better in iOS webviews)
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = chatWithPromptLatestCustomScheme;
-                document.body.appendChild(iframe);
-                debugLog('Iframe created with src: ' + chatWithPromptLatestCustomScheme);
-                
-                // Cleanup iframe after attempt
+                debugLog('iOS: Using iframe for app launch (with 500ms delay)');
                 setTimeout(function() {
-                    if (iframe.parentNode) {
-                        iframe.parentNode.removeChild(iframe);
-                        debugLog('Iframe removed after 2s');
-                    }
-                }, 2000);
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = chatWithPromptLatestCustomScheme;
+                    document.body.appendChild(iframe);
+                    debugLog('Iframe created with src: ' + chatWithPromptLatestCustomScheme);
+                    
+                    // Cleanup iframe after attempt
+                    setTimeout(function() {
+                        if (iframe.parentNode) {
+                            iframe.parentNode.removeChild(iframe);
+                            debugLog('Iframe removed after 2s');
+                        }
+                    }, 2000);
+                }, 500);
             }
             
             // Fallback to store after 2.5 seconds if app didn't open
