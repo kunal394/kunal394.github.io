@@ -78,6 +78,7 @@
         // ============================================
         // DEBUG MODE - Add ?debug=true to see on-screen logs
         // ============================================
+                const urlParams = new URLSearchParams(window.location.search);
         const debugMode = urlParams.get('debug') === 'true';
         let debugLogs = [];
         
