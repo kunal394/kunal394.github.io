@@ -70,17 +70,139 @@
     </style>
 
     <script>
+        const m365url = "https://m365.cloud.microsoft/chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         const customScheme = "ms-officemobile://chat/?titleId=P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4&fromcode=cmmekwv6n3q&utm_campaign=m365paidmktg&utm_source=deeplink&ct=m365paidmktg&ocid=m365paidmktg";
         const intentUrl = "intent://m365.cloud.microsoft/randomUrl#Intent;scheme=https;package=com.microsoft.office.officehubrow;S.browser_fallback_url=https%3A%2F%2Fm365.cloud.microsoft%2Fchat%2Fentity1-d870f6cd-4aa5-4d42-9626-ab690c041429%2FeyJpZCI6IlRXbGpjbTl6YjJaMFZqSjhhSFIwY0hNNkx5OXpkV0p6ZEhKaGRHVXRjMlJtTFdsdWRDNXZabVpwWTJVdVkyOXRMM3hrZFcxdGVYeGtZVFU1TlRRM1pTMDJaVEUzTFRRNFltUXRPRFJoTWkwM05VSTFZVEV6TlRNd1ptWjhaVzR0ZFhNJTNkIiwic2NlbmFyaW8iOiJzaGFyZUxpbmsiLCJwcm9wZXJ0aWVzIjp7InByb21wdFNvdXJjZSI6Im1pY3Jvc29mdCIsImNsaWNrVGltZXN0YW1wIjoiMjAyNS0wNy0wMVQyMToxNzo0MC40NTBaIn0sImNoYXRUeXBlIjoid29yayIsInZlcnNpb24iOjEuMX0%3Ffromcode%3Dcmmekwv6n3q%26utm_campaign%3Dm365paidmktg%26utm_source%3Ddeeplink%26ct%3Dm365paidmktg%26ocid%3Dm365paidmktg;end"
+               const appStoreLink = "https://apps.apple.com/app/apple-store/id541164041?pt=80423&ct=Redirection_mobile%20web_M365&mt=8";
+
+        // ============================================
+        // DEBUG MODE - Add ?debug=true to see on-screen logs
+        // ============================================
+        const debugMode = urlParams.get('debug') === 'true';
+        let debugLogs = [];
+        
+        function debugLog(message) {
+            console.log('[DEBUG] ' + message);
+            if (debugMode) {
+                debugLogs.push(new Date().toISOString().substr(11, 12) + ' - ' + message);
+                updateDebugPanel();
+            }
+        }
+        function updateDebugPanel() {
+            // Wait for body to exist
+            if (!document.body) {
+                document.addEventListener('DOMContentLoaded', updateDebugPanel);
+                return;
+            }
+            
+            let panel = document.getElementById('debug-panel');
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.id = 'debug-panel';
+                panel.style.cssText = 'position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;padding:10px;max-height:20vh;overflow-y:auto;z-index:99999;white-space:pre-wrap;word-break:break-all;';
+                document.body.appendChild(panel);
+            }
+            panel.textContent = debugLogs.join('\n');
+            panel.scrollTop = panel.scrollHeight;
+        }
+        // Log initial detection info
+        debugLog('User Agent: ' + navigator.userAgent);
+        
         function openApp() {
             window.location.href = customScheme;
         }
 
+        function tryCustomSchemeOrFallback() {
+            debugLog('CustomScheme block called');
+        var appLaunched = false;
+        var fallbackTimer = null;
+
+        function cleanup() {
+                        debugLog('Inside cleanup');
+            document.removeEventListener('visibilitychange', visibilityListener);
+            window.removeEventListener('blur', onWindowBlur);
+            window.removeEventListener('focus', onWindowFocus);
+        }
+
+        function onAppLaunched() {
+                        debugLog('Inside onAPpLaunched');
+                                    debugLog('fallbacktimer: ' + fallbackTimer);
+            appLaunched = true;
+            if (fallbackTimer) {
+                clearTimeout(fallbackTimer);
+                fallbackTimer = null;
+            }
+            cleanup();
+        }
+
+        function scheduleAutoRedirectFallback(delay) {
+            debugLog('Inside scheduleAutoRedirect');
+            if (fallbackTimer) {
+                clearTimeout(fallbackTimer);
+            }
+            fallbackTimer = setTimeout(function () {
+                // On iOS, if the document has lost focus the system "Allow?" popup is still visible.
+                // Keep rescheduling until the user makes a choice (document regains focus).
+                if (!document.hasFocus() && !appLaunched) {
+                    scheduleAutoRedirectFallback(300);
+                    return;
+                }
+                cleanup();
+                if (!appLaunched) {
+                window.location.href = appStoreLink;
+                }
+            }, delay);
+        }
+
+        var visibilityListener = function () {
+            if (document.visibilityState === 'hidden') {
+                // Page went to background — app launched successfully
+                onAppLaunched();
+            }
+        };
+
+        // iOS: system "Allow [App] to open?" popup causes window to lose focus.
+        // Pause the fallback timer while the popup is visible so we don't redirect prematurely.
+        var onWindowBlur = function () {
+            if (!appLaunched) {
+                if (fallbackTimer) {
+                    clearTimeout(fallbackTimer);
+                    fallbackTimer = null;
+                }
+            }
+        };
+
+        // iOS: popup dismissed (Allow or Don't Allow) → window regains focus.
+        // Schedule a short grace period: if the app opened, visibilitychange will fire within it.
+        var onWindowFocus = function () {
+            window.removeEventListener('focus', onWindowFocus);
+            window.removeEventListener('blur', onWindowBlur);
+            if (!appLaunched) {
+                scheduleAutoRedirectFallback(300);
+            }
+        };
+
+        document.addEventListener('visibilitychange', visibilityListener);
+
+        var parsedUrl = new URL(m365url);
+        var urlWithoutHost = (parsedUrl.pathname + parsedUrl.search + parsedUrl.hash).replace(/^\//, '');
+        var appSchemeUrl = "ms-officemobile://" + urlWithoutHost;
+        debugLog('URL without host: '+ urlWithoutHost);
+        debugLog('appSchemeUrl: ' + appSchemeUrl);
+            // Attach blur/focus listeners before navigating so the popup is detected.
+            // blur = popup appeared (pause timer), focus = popup dismissed (grace period).
+            window.addEventListener('blur', onWindowBlur);
+            window.addEventListener('focus', onWindowFocus);
+            
+        scheduleAutoRedirectFallback(2500);
+        window.location.href = appSchemeUrl;
+    }
         // Auto-launch the app when page loads
         window.addEventListener("DOMContentLoaded", function() {
             // Show spinner and attempt auto-launch
             setTimeout(() => {
-                window.location.href = intentUrl;
+                //window.location.href = intentUrl;
+                tryCustomSchemeOrFallback();
             }, 500);
 
             // Hide spinner after 2 seconds
