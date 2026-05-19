@@ -205,22 +205,13 @@
                 tryCustomSchemeOrFallback();
             }, 500);
 
-            // Hide spinner after 2 seconds
-            setTimeout(() => {
-                const spinnerContainer = document.getElementById('spinner-container');
-                if (spinnerContainer) {
-                    spinnerContainer.classList.add('hidden');
-                }
-            }, 2000);
+            
         });
     </script>
 </head>
 <body>
 
-    <div id="spinner-container" class="spinner-container">
-        <div class="spinner"></div>
-        <p class="spinner-text">Launching app...</p>
-    </div>
+   
 
     <h1>Continueee in App</h1>
     <p>If the app doesn't open, tap the button below.</p>
