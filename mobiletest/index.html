@@ -289,7 +289,7 @@
             // On iOS, try multiple approaches for silent app launch
             if (isAndroid) {
                 debugLog('Android: Using window.location.href for app launch');
-                window.location.href = chatWithPromptLatestCustomScheme;
+                window.location.href = intentcwp;
             } else {
                 debugLog('iOS: Attempting silent app launch (3 methods)');
                 setTimeout(function() {
